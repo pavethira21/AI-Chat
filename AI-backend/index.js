@@ -94,8 +94,8 @@ app.post('/getAgent',async(req,res)=>{
 
 
 app.post('/agent',async(req,res)=>{
-  const {message,type,agentId} = req.body
-  if(!message || !type || !agentId){
+  const {message,type,agentId,PhoneNumber} = req.body
+  if(!message || !type || !agentId || !PhoneNumber){
     res.json({"message":"Fill Details"})
   }
   main()
@@ -104,11 +104,20 @@ app.post('/agent',async(req,res)=>{
     const agentSelected = await client.db(dbName).collection(agent).findOne({Agent_id:agentId})
     console.log('agent selected')
     console.log(agentSelected)
+    const user = await client.db(dbName).collection(user_collection).findOne({Phno:PhoneNumber})
+    console.log(user.credits)
     if(!agentSelected){
       res.json({message:"Agent not found"})
     }
+    if(!user){
+      res.json({message:"user not found"})
+    }
+    
     if(type ==='Text'){
-      console.log('1')
+      if(user.credits<1){
+        res.json({message:"Not enough credits , Purchase credid/ Add subcription"})
+      }
+      console.log('Has Credit')
       const chatCompletion = await groq.chat.completions.create({
         "messages":[
             {
@@ -122,7 +131,6 @@ app.post('/agent',async(req,res)=>{
             
 
         ],
-
         "model":"llama-3.1-8b-instant",
         "temperature":agentSelected.Temperature,
         "max_tokens":1024,
@@ -132,14 +140,17 @@ app.post('/agent',async(req,res)=>{
 
     });
     
-    console.log('2')
+    console.log('API fetch Completed')
 
 
     if(!chatCompletion){
       console.log('4')
       res.json({message:"AI could not understand what you need could you be more specific"})
     }
+    const response = await client.db(dbName).collection(user_collection).updateOne({Phno:PhoneNumber},{$inc:{credits:-1}})
+    console.log("Credit detected")
     console.log(chatCompletion.choices[0].message.content)
+    console.log(response)
     res.json({message:chatCompletion.choices[0].message.content})
     
 
