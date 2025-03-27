@@ -1,0 +1,171 @@
+[
+    {
+        "Agent_id":"1",
+"Name":"Translate To English",
+"Description":"Translate the given text message using Groq API",
+"Agent_type":"Text",
+"Prompt":"Translate the given message to english do not give explanations",
+"Temperature":0.5,
+"Max_token":1024,
+"Credits":1,
+"Category":"translation",
+"Created_date":"24/03/2025",
+"icon":"language-outline",
+"agent_status":"inactive"
+
+    },
+    {
+        "Agent_id":"2",
+"Name":"translation",
+"Description":"Translate the given voice record using Groq API",
+"Agent_type":"Voice",
+"Credits":5,
+"Category":"translation",
+"Created_date":"24/03/2025",
+
+"agent_status":"inactive"
+
+    },
+    {
+        "Agent_id":"3",
+"Name":"draft an email",
+"Description":"Write an email with the given message do not do Other task",
+"Agent_type":"Text",
+"Prompt":"Write a formal email for the given message" ,
+"Temperature":0.2,
+"Max_token":1024,
+"Credits":1,
+"Category":"Write email",
+"icon":"mail-outline",
+"Created_date":"24/03/2025",
+
+"agent_status":"inactive"
+
+    },
+    {
+        "Agent_id":"4",
+"Name":"Write an email",
+"Description":"Write an email with the given prompt in the recording using Groq LLama Api",
+"Agent_type":"Voice",
+
+"Credits":5,
+"Category":"Write email",
+"Created_date":"24/03/2025",
+
+"agent_status":"inactive"
+
+    },
+    {
+        "Agent_id":"5",
+"Name":"correct Grammer",
+"Description":" Correct the grammer in the given text message using Groq Llama API",
+"Agent_type":"Text",
+"Prompt":"Correct grammar of the given message",
+"Temperature":0.2,
+"Max_token":1024,
+"Credits":1,
+"Category":"Grammar",
+"Created_date":"24/03/2025",
+"icon":"text-outline",
+"agent_status":"inactive"
+
+    },
+    {
+        "Agent_id":"6",
+"Name":"correct Grammer",
+"Description":"Correct the grammer in the given recording using Groq Llama and whisper API",
+"Agent_type":"Voice",
+
+"Credits":5,
+"Category":"Grammar",
+"Created_date":"24/03/2025",
+
+"agent_status":"inactive"
+
+    },
+    {
+        "Agent_id":"7",
+"Name":"Write an Essay",
+"Description":"Write an essay for  the given text message using Groq Llama API",
+"Agent_type":"Text",
+"Prompt":"Write an essay for  the given message.",
+"Temperature":0.5,
+"Max_token":"1024",
+"Credits":1,
+"Category":"Write essay",
+"Created_date":"24/03/2025",
+"icon":"reader-outline",
+"agent_status":"inactive"
+
+    },
+    {
+        "Agent_id":"8",
+    "Name":"Write an email",
+    "Description":"Write an essay for  the given text message using Groq Llama and whisper API",
+    "Agent_type":"Voice",
+    "Credits":4,
+    "Category":"Write essay",
+    "Created_date":"24/03/2025",
+
+    "agent_status":"inactive"
+
+    },
+    {
+        "Agent_id":"9",
+"Name":"General Knowledge",
+"Description":"General Knowledge Question using Groq Llama api",
+"Agent_type":"Text",
+"Prompt":"Answer the general knowledge questions",
+"Temperature":0.5,
+"Max_token":1024,
+"Credits":1,
+"Category":"General Knowledge",
+"Created_date":"24/03/2025",
+"icon":"book-outline",
+"agent_status":"inactive"
+
+    },
+    {
+        "Agent_id":"10",
+"Name":"General Knowledge",
+"Description":"General Knowledge Question using Groq Llama and Whisper api",
+"Agent_type":"voice",
+
+"Credits":4,
+"Category":"General Knowledge",
+"Created_date":"24/03/2025",
+
+"agent_status":"inactive"
+
+    } , {
+        "Agent_id":"11",
+"Name":"Chat",
+"Description":"Casual chat using Groq API",
+"Agent_type":"Text",
+"Prompt":"Have Casual conversation with the user about all the topics",
+"Temperature":0.5,
+"Max_token":"1024",
+"Credits":1,
+"Category":"Chat",
+"Created_date":"24/03/2025",
+"icon":"chatbubbles-outline",
+"agent_status":"inactive"
+
+    },
+    {
+        "Agent_id":"12",
+"Name":"Chat",
+"Description":"Casual chat using Groq Llama and whisper API",
+"Agent_type":"Text",
+
+
+"Credits":5,
+"Category":"Chat",
+"Created_date":"24/03/2025",
+
+"agent_status":"inactive"
+
+    }
+    
+
+]
