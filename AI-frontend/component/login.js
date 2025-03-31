@@ -7,11 +7,12 @@ import {Ionicons} from '@expo/vector-icons';
 import Register from "./registration";
 
 export default function Login(){
-    
+    const IP_Address ='192.168.1.33'
     const [phoneNumber,setPhNo] = useState()
     const [isValid,setValid] = useState(false)
     const [Otp,setOtp]= useState()
     const [user,setUser]=useState()
+    const [token,setToken] = useState()
     const [message,setMessage] = useState()
     let pattern = /^[6-9]\d{9}$/
     const navigation = useNavigation()
@@ -27,15 +28,28 @@ export default function Login(){
    async function handleVerify(){
      if(Otp){
         const inputValue = {verifyToken:Otp,PhoneNumber:phoneNumber}
-        let res= await fetch('http://192.168.1.32:5000/verifyToken',{
+        let res= await fetch(`http://${IP_Address}:5000/verifyToken`,{
             method:"POST",
                 headers:{'content-type':'application/json'},
                 body:JSON.stringify(inputValue)
-              }).then(response => response.json())
-              .then(data=>{ setMessage(data.message),setUser(data.user)})
-            
+              })
+              console.log('after login')
+              console.log("status",res.status)
+              const data = await res.json()
+              console.log(data)
+              setToken(data.token)
+              console.log(data.token)
+              setMessage(data.message)
+              console.log(data.message)
+              setUser(data.user)
+              console.log(data.user)
+             
+              await SecureStore.setItemAsync("token",token)
               
-        
+              if(res.status(200)){
+                navigation.navigate('BtNv') 
+              }
+              
      }
 
    }
@@ -44,7 +58,7 @@ export default function Login(){
         if(phoneNumber?.length ==10 && pattern.test(phoneNumber) ){
             const inputValue = {PhoneNumber:phoneNumber}
             console.log(inputValue)
-            let res= await fetch('http://192.168.1.32:5000/login',{
+            let res= await fetch(`http://${IP_Address}:5000/login`,{
                 method:"POST",
                 headers:{'content-type':'application/json'},
                 body:JSON.stringify(inputValue)
@@ -69,7 +83,7 @@ export default function Login(){
                 <Text style={{...styles.cardText,width:200,marginRight:20}}>Hi, I'm your 24/7 AI english Tutor</Text>
             </View>
             
-            {user&& <Text style={{color:'white'}}>{user.Phno}</Text>}
+            {user&& <Text style={{color:'white'}}>{token.PhoneNumber}</Text>}
             {message=="Verification code Generated" ?
             <>
             <View>

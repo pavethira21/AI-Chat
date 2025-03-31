@@ -15,7 +15,7 @@ import * as SecureStore from 'expo-secure-store';
 export default function Home(){
     const navigation = useNavigation()
     const [agents ,setAgents] = useState([])
-    const IP_Address ='192.168.1.32'
+    const IP_Address ='192.168.1.40'
     console.log(IP_Address)
      function handleAgent(item){
         console.log("hello")
