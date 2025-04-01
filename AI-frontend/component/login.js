@@ -2,12 +2,13 @@ import { SafeAreaView,View, Text, TextInput, Touchable, TouchableOpacity,ToastAn
 import { useNavigation } from "@react-navigation/native";
 import { Image } from "react-native";
 import {styles} from '../Loginstyle';
+import * as SecureStore from 'expo-secure-store';
 import { useState } from "react";
 import {Ionicons} from '@expo/vector-icons';
 import Register from "./registration";
 
 export default function Login(){
-    const IP_Address ='192.168.1.33'
+    const IP_Address ='192.168.1.8'
     const [phoneNumber,setPhNo] = useState()
     const [isValid,setValid] = useState(false)
     const [Otp,setOtp]= useState()
@@ -25,8 +26,11 @@ export default function Login(){
             setValid(false)
         )
     }
+
+
    async function handleVerify(){
      if(Otp){
+        console.log(phoneNumber)
         const inputValue = {verifyToken:Otp,PhoneNumber:phoneNumber}
         let res= await fetch(`http://${IP_Address}:5000/verifyToken`,{
             method:"POST",
@@ -37,18 +41,32 @@ export default function Login(){
               console.log("status",res.status)
               const data = await res.json()
               console.log(data)
-              setToken(data.token)
-              console.log(data.token)
               setMessage(data.message)
               console.log(data.message)
+              setToken(data.token)
+              console.log(data.token)
+              
               setUser(data.user)
               console.log(data.user)
+             try{
+                await SecureStore.setItemAsync("token",`${token}`)
+                await SecureStore.setItemAsync("PhoneNumber",phoneNumber)
+                if(res.status==200){
+                    ToastAndroid.showWithGravityAndOffset(data.message,ToastAndroid.SHORT,
+                        ToastAndroid.BOTTOM,50)
+                    navigation.navigate('BtNv') 
+                  }
+                  else{
+                    ToastAndroid.showWithGravity(data.message,ToastAndroid.SHORT,
+                        ToastAndroid.BOTTOM)
+
+                  }
+             }catch(e){
+                console.log(e)
+             }
              
-              await SecureStore.setItemAsync("token",token)
               
-              if(res.status(200)){
-                navigation.navigate('BtNv') 
-              }
+              
               
      }
 
@@ -64,7 +82,9 @@ export default function Login(){
                 body:JSON.stringify(inputValue)
               }).then(response => response.json())
               .then(data=>{ setMessage(data.message)})
-            if(res.ok){
+            if(res.status==200){
+                ToastAndroid.showWithGravity(message,ToastAndroid.SHORT,
+                    ToastAndroid.BOTTOM)
                 console.log('hello')
             }
 
@@ -78,6 +98,8 @@ export default function Login(){
     
     return(
         <SafeAreaView style={styles.container} >
+        
+            {message&& console.log(message)}
             <View style={{marginBottom:10,flexDirection:"row",padding:10,margin:20,alignItems:"center"}}>
                 <Image source={require("../assets/character.png")} style={{width:"200",height:'200',borderRadius:20,marginLeft:20}}></Image>
                 <Text style={{...styles.cardText,width:200,marginRight:20}}>Hi, I'm your 24/7 AI english Tutor</Text>
@@ -85,7 +107,9 @@ export default function Login(){
             
             {user&& <Text style={{color:'white'}}>{token.PhoneNumber}</Text>}
             {message=="Verification code Generated" ?
+            
             <>
+            
             <View>
             <Text style={{...styles.cardText,marginBottom:20}} >OTP</Text>
             <TextInput style={{borderRadius:10,width:'100%',color:'white',borderWidth:2,borderColor:'#9400D3',borderRadius:20,backgroundColor:'#32174D'}} placeholder="Enter Otp" 

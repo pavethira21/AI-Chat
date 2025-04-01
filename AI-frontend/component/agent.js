@@ -5,21 +5,32 @@ import {Audio} from 'expo-av';
 import { SafeAreaView } from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Agent(){
     const [responses , setResponses] = useState([])
-    const [loading,setLoading] = useState()
+    const [loading,setLoading] = useState(false)
     const [message,setMessage] = useState()
-    const [Type,setType] = useState()
+    const navigation = useNavigation()
     const [recording,setRecording] = useState()
+    let item;
+    async function handleStore(){
+        item = await  SecureStore.getItemAsync('agent')
+        const PhoneNumber = await  SecureStore.getItemAsync('PhoneNumber')
+        console.log("item selected",item)
+    }
+
+    useEffect(()=>{
+        handleStore()
+        
     
-    const Name = SecureStore.getItemAsync('agentName')
-    const IP_Address ='192.168.1.33'
+    })
+    const IP_Address ='192.168.1.8' 
 
    
 
     async function handleRecording(){
-        stopRecording()
+        
         try {
             
             const { status } = await Audio.requestPermissionsAsync();
@@ -65,7 +76,7 @@ export default function Agent(){
   
         
         console.log('Recording stopped and stored at', uri)
-        const input = {PhoneNumber:'6958251478',agentId:'1'}
+        const input = {PhoneNumber:'6958251478',agentId:item}
         formData.append('input', JSON.stringify(input));
             const res = await fetch(`http://${IP_Address}:5000/agentSpeech`,
                 {
@@ -76,8 +87,8 @@ export default function Agent(){
                   
             ).then(response => response.json()) 
             .then(data=>{setResponses(prev =>[...prev,data])})
-            
-            
+            setLoading()
+            setMessage()
            
         console.log('ho')
         
@@ -88,21 +99,27 @@ export default function Agent(){
         
     }
 
+    function handleNavigate(){
+        navigation.navigate('BtNv')
+    }
+
 
     async function handleChat(){
+        setLoading(true)
         console.log('inside chat')
         console.log("mes",message)
-        const inputMsg ={user:message}
+        
         if(message?.length >5){
-            const input = {agentId:'3',type:Type,message:message,PhoneNumber:'9565361425'}
-            setResponses(prev =>[...prev,inputMsg])
+            const input = {agentId:item,type:'text',message:message,PhoneNumber:'9565361425'}
+            
         let res = await fetch(`http://${IP_Address}:5000/agent`,{
             method:"POST",
             headers:{'content-type':'application/json'},
             body:JSON.stringify(input)
           }).then(response => response.json())
           .then(data=>{setResponses(prev =>[...prev,data])})
-          
+          setMessage()
+          setLoading(false)
           
           
         }
@@ -118,39 +135,53 @@ export default function Agent(){
         <>
         {responses && console.log(responses)}
         <SafeAreaView style={styles.container}>
-            
-            <Image source={require("../assets/character.png")} style={{width:"200",height:'200',borderRadius:20 }}></Image>
-                <Text style={{color:'white'}}>Hello! I can help you? </Text>
+            <View style={{backgroundColor:'#121526',flexDirection:'row',width:'100%',margin:20}}>
+                 
+                  <TouchableOpacity  onPress={handleNavigate}  style={{height:50,width:50,position:'absolute',left:0,backgroundColor:'orange',alignItems:'center',justifyContent:'center',borderRadius:20}}>
+                 <Text style={{color:'white'}}><Ionicons name={'arrow-back-outline'} color={'black'} size={25}/></Text>
+                  </TouchableOpacity>
+                  
+                </View>
+           
+                
                 <View style={{flex:1,padding:10}}>
                     {responses.length>=1?
                     <FlatList data={responses} renderItem={({item,index})=>(
+
                        
                         <View key={index} style={{padding:10,marginBottom:15}}>
+                            
                              {(console.log('user',item.user,"messAGE",item.message))}
                        
                         <View style={{backgroundColor:'#A357EF',padding:10,elevation:10,marginBottom:5,borderRadius:20}}>
                         <Text style={{color:'white',padding:10}}>{item.user }</Text>
                         </View>
-                        <View style={{flexDirection:'row',marginTop:10}}>
+                        <View style={{flexDirection:'row',marginTop:10,marginRight:10}}>
                             <Image source={require('../assets/character.png') } style={{height:40,width:40,marginRight:10,borderRadius:20}}></Image>
-                        <ScrollView  style={{backgroundColor:'#3B3E45',maxHeight:250
-                            ,borderBottomLeftRadius:20,borderBottomRightRadius:20,borderTopRightRadius:20,elevation:9
+                        <View  style={{backgroundColor:'#3B3E45'
+                            ,borderBottomLeftRadius:20,borderBottomRightRadius:20,borderTopRightRadius:20,elevation:9,marginRight:30
                         }}>
 
                         <Text style={{color:"white" , padding:10,marginBottom:10}}>{item.message}</Text>
-                        </ScrollView>
+
+                        </View>
+                        {(loading&&<Text style={{color:'white'}}>Ai fetching....</Text>)} 
                         </View>
                         
                         
                         
                         </View>
                         
-                    )}/>:<Text style={{color:'white'}}>ask me anything</Text>}
+                    )}/>
+                    :
+                    <>
+                    <Image source={require("../assets/character.png")} style={{width:"200",height:'200',borderRadius:20 }}></Image>
+                    <Text style={{color:'white'}}>ask me anything</Text></>}
                
                </View>
                 <KeyboardAvoidingView style={{flexDirection:'row',gap:10,padding:20,backgroundColor:'#121526'}} >
                     
-                    <TextInput multiline={true} style={{backgroundColor:'white',width:'320',borderStartStartRadius:10,borderEndStartRadius:10}} value={message} onChangeText={(e)=>{setMessage(e) ,setType('Text')}}  ></TextInput>
+                    <TextInput multiline={true} style={{backgroundColor:'white',width:'320',borderStartStartRadius:10,borderEndStartRadius:10}} value={message} onChangeText={(e)=>{setMessage(e) }}  ></TextInput>
                     
                     
                

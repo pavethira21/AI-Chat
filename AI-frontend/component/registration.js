@@ -7,14 +7,14 @@ import * as SecureStore from 'expo-secure-store';
 
 export default function Register(){
      const PhoneNumber = SecureStore.getItemAsync('PhoneNumber')
-     const IP_Address ='192.168.1.33'
+  const IP_Address ='192.168.1.33'
     const languages =['Tamil','Hindi','Kannada','Telugu','Marathi','Malayalam']
     const Occupation = ['College','Work','Home Maker','Teacher','Other']
     const [age,setAge] = useState('adult')
     const [name,setName] = useState()
     const [lang,setLang] =useState()
     const [Ocpt,setOcpt] = useState()
-    const [int,setInt] = useState()
+    const [inte,setInt] = useState()
     const [interest,setInterest] = useState([])
 
     async function handleRegister(){
@@ -48,9 +48,12 @@ export default function Register(){
         <Text style={styles.cardText}>Interests</Text>
         <View style={{display:'flex',flexDirection:'row'}}>
         <TextInput style={{borderWidth:2,borderColor:'#3B3E45',width:250}}  onChangeText={(e)=>{setInt(e)}} ></TextInput>
-        
-        <TouchableOpacity style={{padding:10,alignItems:'center',justifyContent:'center'}} onPress={console.log(int)}><Text style={{color:'white',textAlign:"center"}}>ADD</Text></TouchableOpacity>
+        <TouchableOpacity style={{padding:10,alignItems:'center',justifyContent:'center'}} onPress={setInterest(inte)}><Text style={{color:'white',textAlign:"center"}}>ADD</Text></TouchableOpacity>
         </View>
+        {/* {interest &&
+        <FlatList data={interest} renderItem={({item} )=>(<View> {item}</View>)} keyExtractor={(item, index) => index.toString()}></FlatList>
+        } */}
+        
         <Text style={styles.cardText}>What is your Occupation</Text>
         <FlatList data={Occupation}  numColumns={3}  renderItem={({item})=>(
            <View style={{padding:10}}>

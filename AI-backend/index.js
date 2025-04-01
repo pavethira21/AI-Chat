@@ -47,7 +47,7 @@ app.post('/login',async(req,res)=>{
             encoding: 'base32'
           });
           console.log(token)
-         res.json({message:"Verification code Generated"})
+         res.status(200).json({message:"Verification code Generated"})
         }  
     }catch(e){
       console.log(e)
@@ -121,12 +121,35 @@ app.post('/verifyToken', async(req,res)=>{
 app.post('/getAgent',async(req,res)=>{
   main()
   try {
-      const agents = await client.db(dbName).collection(agent).find({},{projection:{Agent_id:1,Name:1,Category:1,Description:1,icon:1}}).toArray()
+      const agents = await client.db(dbName).collection(agent).find({Agent_type:'Text'},{projection:{Agent_id:1,Name:1,Category:1,Description:1,icon:1}}).toArray()
       if(agents){
         res.json({agents:agents})
       }
   }catch(e){
     console.log(e)
+  }
+})
+
+app.post('/getCredit',async(req,res)=>{
+  main()
+  try{
+    console.log('inside try')
+    const {PhoneNumber} = req.body
+    if(!PhoneNumber){
+      return res.json({message:"Phone number needed"})
+    }
+    console.log('getting user try')
+    const user = await client.db(dbName).collection(user_collection).findOne({Phno:PhoneNumber},{projection:{credits:1}})
+    console.log(user)
+    if(!user){
+      return res.json({message:"user Not found"})
+    }
+    console.log('got user try')
+    return res.json({credit:user.credits})
+  }catch(e){
+    console.log(e)
+  }finally{
+    client.close()
   }
 })
 
@@ -233,11 +256,32 @@ app.post ('/agentSpeech',upload.single('audio'),async(req,res)=>{
 
 })
 
-app.post('/agent',upload.single('audio'),async(req,res)=>{
+app.post('/getChat',async(req,res)=>{
+  const {PhoneNumber,Agent_id} =req.body
+  if(!PhoneNumber|| Agent_id){
+    return res.json({message:"Details not enough"})
+  }
+
+  const chats = await client.db(dbName).collection(chat).find({Phno:PhoneNumber}).toArray()
+  if(!chats){
+    return res.json({message:"chats not found"})
+  }
+  return res.json({chat:chats})
+})
+
+app.post('/agent',async(req,res)=>{
+  console.log('api hit')
   const inputData = req.body
-    const { message, type, agentId, PhoneNumber } = inputData;
+  const todayDate = date.getDate()
+  const todayMonth = (date.getMonth()) + 1
+  const todayYear = date.getFullYear()
+  const hours = date.getHours()
+  const minutes = date.getMinutes()
+  const Date = todayDate+':'+todayMonth +":"+todayYear
+  const time=hours+":"+minutes
+    const { message, agentId, PhoneNumber } = inputData;
     console.log("Parsed input:", inputData);
-  if(!type || !agentId || !PhoneNumber){
+  if(!agentId || !PhoneNumber){
     return res.json({"message":"Fill Details"})
   }
   main()
@@ -254,7 +298,7 @@ app.post('/agent',upload.single('audio'),async(req,res)=>{
     if(!user){
       return res.json({message:"user not found"})
     }
-    if(type ==='Text'){
+    
       if(user.credits<1){
         return res.json({message:"Not enough credits , Purchase credits/ Add subcription"})
       }
@@ -291,14 +335,39 @@ app.post('/agent',upload.single('audio'),async(req,res)=>{
     // const response = await client.db(dbName).collection(user_collection).updateOne({Phno:PhoneNumber},{$inc:{credits:-1}})
     // console.log("Credit detected")
     console.log(chatCompletion.choices[0].message.content)
-    
+    const chatInsert = await client.db(dbName).collection(chat).insertOne({Phno:user.Phno,Agent_id:agentSelected.Agent_id,Agent_type:agentSelected.Agent_type,Input:message,Output:chatCompletion.choices[0].message.content,time_Stamp:[Date,time],creditsDebited:1,agent_category:agentSelected.agent_category})
+    console.log(chatInsert)
    return res.json({user:message,message:chatCompletion.choices[0].message.content})
-    }
+    
 
 
   }catch(e){
     console.log(e)
   }
+})
+
+app.post('/getUser',async(req,res)=>{
+  main()
+  try{
+    console.log('inside try')
+    const {PhoneNumber} = req.body
+    if(!PhoneNumber){
+      return res.json({message:"Phone number needed"})
+    }
+    console.log('getting user try')
+    const user = await client.db(dbName).collection(user_collection).findOne({Phno:PhoneNumber})
+    console.log(user)
+    if(!user){
+      return res.json({message:"user Not found"})
+    }
+    console.log('got user try')
+    return res.json({user:user})
+  }catch(e){
+    console.log(e)
+  }finally{
+    client.close()
+  }
+  
 })
 
 

@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Login from './component/login'
 import Home from './component/home'
+import Profile from './component/profile'
 import BottomNavigate from './component/BottomNavigate';
 import { styles } from './Loginstyle'; 
 import {StyleSheet,  Text, View } from 'react-native';
@@ -12,9 +13,10 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName="Login">
+      <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName="BtNv">
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name='BtNv' component={BottomNavigate}/>
+        <Stack.Screen name='Profile' component={Profile}/>
         {/* <Stack.Screen name='Home' component={Home}/> */}
         <Stack.Screen name='Register' component={Register}/>
         <Stack.Screen name='Agent' component={Agent}/>

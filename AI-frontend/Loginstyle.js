@@ -16,8 +16,7 @@ export const styles = StyleSheet.create({
     
   },
   grid:{
-    flexDirection: "row",
-    flexWrap: "wrap",
+    
     padding:19,
     paddingBottom: 20,
     
@@ -48,7 +47,7 @@ export const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "bold",
-    marginTop: 8,
+    marginTop: 20,
     textAlign: "center",
   },
   description:{
@@ -62,7 +61,9 @@ export const styles = StyleSheet.create({
     position: "absolute",
     top: 10,
     left: 10,
-  }
+  },
+  profileDetails:
+  {color:'white',padding:10,borderColor:'white',borderWidth:2,margin:20,borderRadius:20}
 
 });
 
