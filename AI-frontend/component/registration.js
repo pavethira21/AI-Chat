@@ -1,13 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, SafeAreaView,Text,TextInput,TouchableOpacity,View } from "react-native";
 import { styles } from "../Loginstyle";
 import { FlatList } from "react-native-gesture-handler";
 import {Ionicons} from '@expo/vector-icons';
-import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from "@react-navigation/native";
 
 export default function Register(){
-     const PhoneNumber = SecureStore.getItemAsync('PhoneNumber')
-  const IP_Address ='192.168.1.33'
+    const navigation = useNavigation()
+    const [PhoneNumber,setPhoneNumber] = useState()
+    useEffect(()=>{
+        async function phCall() {
+            
+        
+            try{
+                const PhoneNumber = await AsyncStorage.getItem('PhoneNumber')
+                setPhoneNumber(PhoneNumber)
+            }catch(e){
+                console.log(e)
+            }
+        }
+        phCall()
+    },[])
+    
+     
+   const IP_Address ='192.168.1.8'
     const languages =['Tamil','Hindi','Kannada','Telugu','Marathi','Malayalam']
     const Occupation = ['College','Work','Home Maker','Teacher','Other']
     const [age,setAge] = useState('adult')
@@ -16,16 +33,35 @@ export default function Register(){
     const [Ocpt,setOcpt] = useState()
     const [inte,setInt] = useState()
     const [interest,setInterest] = useState([])
+    function removeItem(i){
+        setInterest((prev) => prev.filter((item) => item !== i));
+    }
 
     async function handleRegister(){
         const input = {PhoneNumber:PhoneNumber,Lang:lang,age:age,Interest:interest,Name:name,ocuupation:Ocpt}
-       let res= fetch(`http://${IP_Address}:5000/register`,{
+        console.log(PhoneNumber)
+       let res= await fetch(`http://${IP_Address}:5000/register`,{
             method:"POST",
             headers:{'content-type':'application/json'},
             body:JSON.stringify(input)
-          }).then(response => response.json())
-          .then((data)=>{setMessage(data),console.log(message)})
 
+          })
+          const data = await res.json()
+          
+          
+        if(res.status ==200){
+            
+                    await AsyncStorage.setItem("PhoneNumber",PhoneNumber)
+            navigation.replace('BtNv')
+            ToastAndroid.showWithGravity(`${data.message}`,ToastAndroid.SHORT,
+                                    ToastAndroid.BOTTOM)
+            
+        }
+        else{
+            ToastAndroid.showWithGravity(`${data.message}`,ToastAndroid.SHORT,
+                ToastAndroid.BOTTOM)
+
+        }
           
     }
     
@@ -47,12 +83,9 @@ export default function Register(){
         <TextInput style={{borderWidth:2,borderColor:'#3B3E45'}} onChangeText={(e)=>{setName(e)}} value={name}></TextInput>
         <Text style={styles.cardText}>Interests</Text>
         <View style={{display:'flex',flexDirection:'row'}}>
-        <TextInput style={{borderWidth:2,borderColor:'#3B3E45',width:250}}  onChangeText={(e)=>{setInt(e)}} ></TextInput>
-        <TouchableOpacity style={{padding:10,alignItems:'center',justifyContent:'center'}} onPress={setInterest(inte)}><Text style={{color:'white',textAlign:"center"}}>ADD</Text></TouchableOpacity>
-        </View>
-        {/* {interest &&
-        <FlatList data={interest} renderItem={({item} )=>(<View> {item}</View>)} keyExtractor={(item, index) => index.toString()}></FlatList>
-        } */}
+        <TextInput style={{borderWidth:2,borderColor:'#3B3E45',width:250}}  onChangeText={(e)=>{setInt(e)}} ></TextInput> 
+        <TouchableOpacity style={{padding:10,alignItems:'center',justifyContent:'center'}} onPress={()=>(setInterest(inte))}><Text style={{color:'white',textAlign:"center"}}>ADD</Text></TouchableOpacity>
+        </View> 
         
         <Text style={styles.cardText}>What is your Occupation</Text>
         <FlatList data={Occupation}  numColumns={3}  renderItem={({item})=>(
@@ -61,11 +94,9 @@ export default function Register(){
                     <Text style={{color:'white',padding:10}}>{item}</Text>
                 </TouchableOpacity>
           </View>
-        )} keyExtractor={(item, index) => index.toString()}/>
+        )} keyExtractor={(item, index) => index.toString()}/> 
         
-        {/* <View>
-        <Pressable style={{...styles.button,width:'90%'}}> <Text style={{color:'white'}}>Continue</Text> </Pressable>
-        </View> */}
+        
         <TouchableOpacity onPress={handleRegister} style={styles.button}><Text>Continue</Text></TouchableOpacity>
         </View>
 

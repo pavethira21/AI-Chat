@@ -2,13 +2,13 @@ import { SafeAreaView,View, Text, TextInput, Touchable, TouchableOpacity,ToastAn
 import { useNavigation } from "@react-navigation/native";
 import { Image } from "react-native";
 import {styles} from '../Loginstyle';
-import * as SecureStore from 'expo-secure-store';
-import { useState } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useEffect, useState } from "react";
 import {Ionicons} from '@expo/vector-icons';
 import Register from "./registration";
 
 export default function Login(){
-    const IP_Address ='192.168.1.8'
+     const IP_Address ='192.168.1.8'
     const [phoneNumber,setPhNo] = useState()
     const [isValid,setValid] = useState(false)
     const [Otp,setOtp]= useState()
@@ -17,6 +17,8 @@ export default function Login(){
     const [message,setMessage] = useState()
     let pattern = /^[6-9]\d{9}$/
     const navigation = useNavigation()
+
+   
     function isValidPhoneNumber(num){
         
         if(num && pattern.test(num) ){
@@ -43,21 +45,22 @@ export default function Login(){
               console.log(data)
               setMessage(data.message)
               console.log(data.message)
-              setToken(data.token)
+             
               console.log(data.token)
               
               setUser(data.user)
               console.log(data.user)
              try{
-                await SecureStore.setItemAsync("token",`${token}`)
-                await SecureStore.setItemAsync("PhoneNumber",phoneNumber)
+                await AsyncStorage.setItem("token",`${data.token}`)
+                await AsyncStorage.setItem("PhoneNumber",phoneNumber)
                 if(res.status==200){
-                    ToastAndroid.showWithGravityAndOffset(data.message,ToastAndroid.SHORT,
-                        ToastAndroid.BOTTOM,50)
-                    navigation.navigate('BtNv') 
+                   
+                    ToastAndroid.showWithGravity(`${data.message}`,ToastAndroid.SHORT,
+                        ToastAndroid.BOTTOM)
+                    navigation.replace('BtNv') 
                   }
                   else{
-                    ToastAndroid.showWithGravity(data.message,ToastAndroid.SHORT,
+                    ToastAndroid.showWithGravity(`${data.message}`,ToastAndroid.SHORT,
                         ToastAndroid.BOTTOM)
 
                   }
@@ -101,35 +104,42 @@ export default function Login(){
         
             {message&& console.log(message)}
             <View style={{marginBottom:10,flexDirection:"row",padding:10,margin:20,alignItems:"center"}}>
-                <Image source={require("../assets/character.png")} style={{width:"200",height:'200',borderRadius:20,marginLeft:20}}></Image>
+                <Image source={require("../assets/character.png")} style={{width:150,height:150,borderRadius:20,marginLeft:20}}></Image>
                 <Text style={{...styles.cardText,width:200,marginRight:20}}>Hi, I'm your 24/7 AI english Tutor</Text>
             </View>
             
-            {user&& <Text style={{color:'white'}}>{token.PhoneNumber}</Text>}
+            {user&& <Text style={{color:'white'}}>{token}</Text>}
             {message=="Verification code Generated" ?
             
             <>
             
             <View>
             <Text style={{...styles.cardText,marginBottom:20}} >OTP</Text>
-            <TextInput style={{borderRadius:10,width:'100%',color:'white',borderWidth:2,borderColor:'#9400D3',borderRadius:20,backgroundColor:'#32174D'}} placeholder="Enter Otp" 
+            <View style={{display:"flex",flexWrap:"wrap",flexDirection:'row',marginBottom:20,borderWidth:2,borderColor:'#A357EF',borderRadius:20,backgroundColor:'#121526'}}>
+            <TextInput placeholderTextColor={'gray'} 
+            style={{borderRadius:10,width:'100%',color:'white',borderWidth:1,borderColor:'#A357EF',borderRadius:20,backgroundColor:'#121526'}} placeholder="Enter Generated  Otp" 
             value={Otp}  
             keyboardType="numeric"
             onChangeText={(e)=>{setOtp(e) }}></TextInput>
+            </View>
             
             
         </View>
         <TouchableOpacity style={{...styles.button,marginTop:20}} onPress={handleVerify} ><Text>verify OTP</Text></TouchableOpacity>
-        </>:message=="user not found"?<>
-        <Register/>
-        </>:<>
+        </>:
+        // message=="user not found"?<>
+        // <Register/>
+        // </>:
+        <>
         <View >
             <Text style={{...styles.cardText,marginBottom:20}}>What's Your PhoneNumber?</Text>
-            <View style={{display:"flex",flexWrap:"wrap",flexDirection:'row',marginBottom:20,borderWidth:2,borderColor:'#9400D3',borderRadius:20,backgroundColor:'#32174D'}}>
+            <View style={{display:"flex",flexWrap:"wrap",flexDirection:'row',marginBottom:20,borderWidth:2,borderColor:'#A357EF',borderRadius:20,backgroundColor:'#121526'}}>
                 
                 <TextInput
                 style={{borderRadius:10,width:'85%',color:'white',}}
+                placeholderTextColor={'gray'}
                 keyboardType="numeric"
+                
                 placeholder="Enter PhoneNumber" 
                 value={phoneNumber} 
                 maxLength={10}

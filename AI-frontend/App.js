@@ -13,7 +13,7 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName="BtNv">
+      <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName="Login">
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name='BtNv' component={BottomNavigate}/>
         <Stack.Screen name='Profile' component={Profile}/>

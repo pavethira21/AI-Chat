@@ -5,16 +5,18 @@ import {Ionicons} from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context'
 import HeaderTag from './header'
 import { useNavigation } from '@react-navigation/native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Profile  ()  {
     const [user,setUser] = useState()
-    const IP_Address ='192.168.1.8'
+     const IP_Address ='192.168.1.8'
     const navigation = useNavigation()
     useEffect(()=>{
         handleGetUser()
         
     },[])
-    function handleLogOut(){
+    async function handleLogOut(){
+        await AsyncStorage.removeItem("PhoneNumber")
         navigation.replace('Login')
     }
     function handleClose(){
@@ -23,12 +25,12 @@ function Profile  ()  {
     
     async function handleGetUser(){
         console.log('get user')
-        
+        const PhoneNumber = await AsyncStorage.getItem("PhoneNumber")
         console.log('get input')
         let res = await fetch(`http://${IP_Address}:5000/getUser`,{
             method:"POST",
                 headers:{'content-type':'application/json'},
-                body:JSON.stringify({PhoneNumber:"6958251478"})
+                body:JSON.stringify({PhoneNumber:PhoneNumber})
               }).then(response=>response.json()) 
               .then((data)=>{setUser(data.user)})
             console.log('after recieve')

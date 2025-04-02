@@ -1,4 +1,4 @@
-import * as SecureStore from 'expo-secure-store';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View,Text,Image, TextInput, TouchableOpacity, KeyboardAvoidingView, FlatList, ScrollView } from 'react-native';
 import { styles } from '../Loginstyle';
 import {Audio} from 'expo-av';
@@ -9,14 +9,18 @@ import { useNavigation } from '@react-navigation/native';
 
 export default function Agent(){
     const [responses , setResponses] = useState([])
+    const [PhoneNumber,setPhoneNumber] =useState()
     const [loading,setLoading] = useState(false)
     const [message,setMessage] = useState()
     const navigation = useNavigation()
+    const [item,setItem] = useState()
     const [recording,setRecording] = useState()
-    let item;
+    
     async function handleStore(){
-        item = await  SecureStore.getItemAsync('agent')
-        const PhoneNumber = await  SecureStore.getItemAsync('PhoneNumber')
+        const item = await  AsyncStorage.getItem('agent')
+        const phoneNumber = await  AsyncStorage.getItem('PhoneNumber')
+        setPhoneNumber(phoneNumber)
+        setItem(item)
         console.log("item selected",item)
     }
 
@@ -24,13 +28,13 @@ export default function Agent(){
         handleStore()
         
     
-    })
-    const IP_Address ='192.168.1.8' 
+    },[])
+     const IP_Address ='192.168.1.8'
 
    
 
     async function handleRecording(){
-        
+        stopRecording()
         try {
             
             const { status } = await Audio.requestPermissionsAsync();
@@ -44,7 +48,7 @@ export default function Agent(){
             );
             
             setRecording(recording);
-            setType('speech')
+           
             
       
           } catch (err) {
@@ -76,7 +80,7 @@ export default function Agent(){
   
         
         console.log('Recording stopped and stored at', uri)
-        const input = {PhoneNumber:'6958251478',agentId:item}
+        const input = {PhoneNumber:PhoneNumber,agentId:item}
         formData.append('input', JSON.stringify(input));
             const res = await fetch(`http://${IP_Address}:5000/agentSpeech`,
                 {
@@ -110,7 +114,7 @@ export default function Agent(){
         console.log("mes",message)
         
         if(message?.length >5){
-            const input = {agentId:item,type:'text',message:message,PhoneNumber:'9565361425'}
+            const input = {agentId:item,type:'text',message:message,PhoneNumber:PhoneNumber}
             
         let res = await fetch(`http://${IP_Address}:5000/agent`,{
             method:"POST",
@@ -144,9 +148,9 @@ export default function Agent(){
                 </View>
            
                 
-                <View style={{flex:1,padding:10}}>
+                <View style={{flex:1,padding:10,marginTop:25}}>
                     {responses.length>=1?
-                    <FlatList data={responses} renderItem={({item,index})=>(
+                    <FlatList data={responses}  renderItem={({item,index})=>(
 
                        
                         <View key={index} style={{padding:10,marginBottom:15}}>

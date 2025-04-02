@@ -70,16 +70,20 @@ app.post('/register',async(req,res)=>{
       if(!PhoneNumber,!Lang,!age,!Interest,!Name,!ocuupation){
         res.json({message:"Fill all the Details"})
       }
-      const response = await client.db(dbName).collection(user_collection).updateOne({Phno:PhoneNumber},{$set:{lang:Lang,age:age,Area_of_interest:Interest,userName:Name,occupation:ocuupation,credits:25,subcription:{},created_date:created_date,status:'active'}})
-      client.close()
+      console.log('here')
+      const response = await client.db(dbName).collection(user_collection).insertOne({Phno:PhoneNumber,lang:Lang,age:age,Area_of_interest:Interest,userName:Name,occupation:ocuupation,credits:25,subcription:{},created_date:created_date,status:'active'})
+      console.log('after update')
       if (response.acknowledged){
-        return res.json({message:"Updated successfully"})
+        console.log('here if')
+        return res.status(200).json({message:"Registered successfully"})
     }else{
-        return res.json({msg:"Not Updated"})
+        return res.status(400).json({msg:"Not Updated"})
     }
 
   }catch(e){
     console.log(e)
+  }finally{
+    client.close()
   }
 })
 
@@ -93,8 +97,6 @@ app.post('/verifyToken', async(req,res)=>{
         token: verifyToken,
         window: 6
       });
-      
-      
       if(tokenValidates === true){
         if(PhoneNumber){
           const user = await client.db(dbName).collection(user_collection).findOne({Phno:PhoneNumber})
@@ -110,10 +112,12 @@ app.post('/verifyToken', async(req,res)=>{
        
       }
       else{
-       return res.json({message:"Verification code Incorrect"})
+       return res.status(400).json({message:"Verification code Incorrect"})
       }
     }catch(e){
       console.log("error",e)
+    }finally{
+      client.close()
     }
     
 })
@@ -127,6 +131,8 @@ app.post('/getAgent',async(req,res)=>{
       }
   }catch(e){
     console.log(e)
+  }finally{
+    client.close()
   }
 })
 
@@ -162,9 +168,11 @@ app.post('/creditUpdate',async(req,res)=>{
     main()
     const response = await client.db(dbName).collection(user_collection)
     .updateOne({Phno:PhoneNumber},{$inc:{credits:creditIncrease}})
-    res.json(response)
+    res.status(200).json(response)
   }catch(e){
     console.log(e)
+  }finally{
+    client.close()
   }
 })
 
@@ -240,8 +248,8 @@ app.post ('/agentSpeech',upload.single('audio'),async(req,res)=>{
 
 
 
-      // const response = await client.db(dbName).collection(user_collection).updateOne({Phno:PhoneNumber},{$inc:{credits:-4}})
-      // console.log("Credit detected",response)
+      const response = await client.db(dbName).collection(user_collection).updateOne({Phno:PhoneNumber},{$inc:{credits:-4}})
+      console.log("Credit detected",response)
       
       console.log(chatCompletion.choices[0].message.content)
       
@@ -252,26 +260,39 @@ app.post ('/agentSpeech',upload.single('audio'),async(req,res)=>{
 
   }catch(e){
     console.log(e)
+  }finally{
+    client.close()
   }
 
 })
 
 app.post('/getChat',async(req,res)=>{
+  try{
+    main()
   const {PhoneNumber,Agent_id} =req.body
   if(!PhoneNumber|| Agent_id){
     return res.json({message:"Details not enough"})
   }
 
-  const chats = await client.db(dbName).collection(chat).find({Phno:PhoneNumber}).toArray()
+  const chats = await client.db(dbName).collection(chat).find({Phno:PhoneNumber,Agent_id:'11'},
+    {projection:{Input:1,Output:1,time_Stamp:1}}).toArray()
   if(!chats){
     return res.json({message:"chats not found"})
   }
-  return res.json({chat:chats})
+  console.log(chats)
+  return res.status(200).json({chat:chats})
+  }catch(e){
+    console.log(e)
+  }finally{
+    client.close()
+  }
+  
 })
 
 app.post('/agent',async(req,res)=>{
   console.log('api hit')
   const inputData = req.body
+
   const todayDate = date.getDate()
   const todayMonth = (date.getMonth()) + 1
   const todayYear = date.getFullYear()
@@ -332,17 +353,20 @@ app.post('/agent',async(req,res)=>{
       console.log('4')
      return res.json({message:"AI could not understand what you need could you be more specific"})
     }
-    // const response = await client.db(dbName).collection(user_collection).updateOne({Phno:PhoneNumber},{$inc:{credits:-1}})
-    // console.log("Credit detected")
+    const response = await client.db(dbName).collection(user_collection).updateOne({Phno:PhoneNumber},{$inc:{credits:-1}})
+    console.log("Credit detected")
     console.log(chatCompletion.choices[0].message.content)
-    const chatInsert = await client.db(dbName).collection(chat).insertOne({Phno:user.Phno,Agent_id:agentSelected.Agent_id,Agent_type:agentSelected.Agent_type,Input:message,Output:chatCompletion.choices[0].message.content,time_Stamp:[Date,time],creditsDebited:1,agent_category:agentSelected.agent_category})
+    const chatInsert = await client.db(dbName).collection(chat).insertOne({Phno:user.Phno,Agent_id:agentSelected.Agent_id,Agent_type:agentSelected.Agent_type,Input:message,Output:chatCompletion.choices[0].message.content,time_Stamp:[Date,time],creditsDebited:1,agent_category:agentSelected.agent_Category})
     console.log(chatInsert)
+    console.log('inserted')
    return res.json({user:message,message:chatCompletion.choices[0].message.content})
     
 
 
   }catch(e){
     console.log(e)
+  }finally{
+    client.close()
   }
 })
 
