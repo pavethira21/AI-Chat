@@ -7,7 +7,7 @@ import {Ionicons} from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 
-export default function Agent(){
+export default function Agent({route}){
     const [responses , setResponses] = useState([])
     const [PhoneNumber,setPhoneNumber] =useState()
     const [loading,setLoading] = useState(false)
@@ -16,20 +16,49 @@ export default function Agent(){
     const [item,setItem] = useState()
     const [recording,setRecording] = useState()
     
+    const chat = route?.params?.chat
+
+    useEffect(() => {
+        console.log('useffect',chat)
+        if (chat) {  
+            console.log('insideif');
+            chat.forEach((item) => {
+                console.log("Inside if", item);
+                setResponses(prev =>[...prev,item]);
+
+            });
+        } 
+    }, [chat]);
+    
+
+    useEffect(() => {
+        handleStore()
+
+          const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+            handleNavigate()
+            console.log('printed')
+         
+          });
+      
+          return unsubscribe;
+        }, [navigation]);
     async function handleStore(){
         const item = await  AsyncStorage.getItem('agent')
         const phoneNumber = await  AsyncStorage.getItem('PhoneNumber')
         setPhoneNumber(phoneNumber)
         setItem(item)
-        console.log("item selected",item)
+        console.log("item selected",phoneNumber)
+        if(item==11){
+            setModal(true)
+        }
     }
 
-    useEffect(()=>{
-        handleStore()
+    // useEffect(()=>{
+        
         
     
-    },[])
-     const IP_Address ='192.168.1.8'
+    // },[])
+     const IP_Address ='192.168.1.5'
 
    
 
@@ -103,8 +132,26 @@ export default function Agent(){
         
     }
 
-    function handleNavigate(){
-        navigation.navigate('BtNv')
+    async function handleNavigate(){
+        const phoneNumber = await  AsyncStorage.getItem('PhoneNumber')
+        console.log('hit')
+        if(responses.length<1){
+            navigation.navigate('BtNv')
+        }
+        else{
+            const input = {agentId:item,message:responses,PhoneNumber:phoneNumber}
+        const addDb = await fetch(`http://${IP_Address}:5000/addChathHistory`,{
+            method:"POST",
+            headers:{'content-type':'application/json'},
+            body:JSON.stringify(input)
+        })
+
+        if (addDb.status ==200){
+            navigation.navigate('BtNv')
+        }
+        }
+    
+        
     }
 
 
@@ -113,7 +160,7 @@ export default function Agent(){
         console.log('inside chat')
         console.log("mes",message)
         
-        if(message?.length >5){
+        if(message?.length >=5){
             const input = {agentId:item,type:'text',message:message,PhoneNumber:PhoneNumber}
             
         let res = await fetch(`http://${IP_Address}:5000/agent`,{
@@ -137,13 +184,13 @@ export default function Agent(){
     
     return(
         <>
-        {responses && console.log(responses)}
+        {responses && console.log("responses",responses)}
         <SafeAreaView style={styles.container}>
             <View style={{backgroundColor:'#121526',flexDirection:'row',width:'100%',margin:20}}>
                  
-                  <TouchableOpacity  onPress={handleNavigate}  style={{height:50,width:50,position:'absolute',left:0,backgroundColor:'orange',alignItems:'center',justifyContent:'center',borderRadius:20}}>
+                  {/* <TouchableOpacity  onPress={handleNavigate}  style={{height:50,width:50,position:'absolute',left:0,backgroundColor:'orange',alignItems:'center',justifyContent:'center',borderRadius:20}}>
                  <Text style={{color:'white'}}><Ionicons name={'arrow-back-outline'} color={'black'} size={25}/></Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                   
                 </View>
            
@@ -174,20 +221,31 @@ export default function Agent(){
                         
                         
                         
-                        </View>
+                        </View> 
                         
                     )}/>
-                    :
+                    : 
                     <>
                     <Image source={require("../assets/character.png")} style={{width:"200",height:'200',borderRadius:20 }}></Image>
                     <Text style={{color:'white'}}>ask me anything</Text></>}
+                    {chat&&
+                    <>
+
+                    {/* <FlatList data={chat } renderItem={({item,index})=>(
+                        console.log("items",index,item.conversation),
+
+                        <Text style={{color:'white'}}>{item.time_Stamp}</Text>
+    )}/> */}
+                    
+                    </>
+                    }
                
                </View>
                 <KeyboardAvoidingView style={{flexDirection:'row',gap:10,padding:20,backgroundColor:'#121526'}} >
                     
                     <TextInput multiline={true} style={{backgroundColor:'white',width:'320',borderStartStartRadius:10,borderEndStartRadius:10}} value={message} onChangeText={(e)=>{setMessage(e) }}  ></TextInput>
                     
-                    
+                     
                
                     {(message&&message.length>=1)?<TouchableOpacity onPress={handleChat} style={{backgroundColor:'#9400D3',borderRadius:40,width:50 ,justifyContent:'center',alignItems:'center'}} ><Ionicons style={{color:'white',position:'absolute'}}  name={"send"} size={25} /></TouchableOpacity>:
                     <TouchableOpacity onPressIn={handleRecording}  onPressOut={stopRecording} style={{backgroundColor:'#9400D3',borderRadius:40,width:50 ,justifyContent:'center',alignItems:'center'}} ><Ionicons style={{color:'white',position:'absolute'}}  name={"mic"} size={25}/></TouchableOpacity>}

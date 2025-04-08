@@ -29,6 +29,7 @@ var secret = speakeasy.generateSecret({length: 20});
 const groq = new Groq({
   apiKey: GROQ_API_KEY
 });
+
 async function main(){
     try{
         await client.connect();
@@ -269,13 +270,14 @@ app.post ('/agentSpeech',upload.single('audio'),async(req,res)=>{
 app.post('/getChat',async(req,res)=>{
   try{
     main()
-  const {PhoneNumber,Agent_id} =req.body
-  if(!PhoneNumber|| Agent_id){
+  const {PhoneNumber} =req.body
+  if(!PhoneNumber){
     return res.json({message:"Details not enough"})
   }
 
-  const chats = await client.db(dbName).collection(chat).find({Phno:PhoneNumber,Agent_id:'11'},
-    {projection:{Input:1,Output:1,time_Stamp:1}}).toArray()
+  const chats = await client.db(dbName).collection(chat).find({Phno:PhoneNumber},
+    {projection:{conversation:1,time_Stamp:1,_id:0,Agent_id:1}}).sort({time_Stamp:-1}).toArray()
+    console.log("chats",chats[9])
   if(!chats){
     return res.json({message:"chats not found"})
   }
@@ -293,13 +295,7 @@ app.post('/agent',async(req,res)=>{
   console.log('api hit')
   const inputData = req.body
 
-  const todayDate = date.getDate()
-  const todayMonth = (date.getMonth()) + 1
-  const todayYear = date.getFullYear()
-  const hours = date.getHours()
-  const minutes = date.getMinutes()
-  const Date = todayDate+':'+todayMonth +":"+todayYear
-  const time=hours+":"+minutes
+  
     const { message, agentId, PhoneNumber } = inputData;
     console.log("Parsed input:", inputData);
   if(!agentId || !PhoneNumber){
@@ -356,8 +352,8 @@ app.post('/agent',async(req,res)=>{
     const response = await client.db(dbName).collection(user_collection).updateOne({Phno:PhoneNumber},{$inc:{credits:-1}})
     console.log("Credit detected")
     console.log(chatCompletion.choices[0].message.content)
-    const chatInsert = await client.db(dbName).collection(chat).insertOne({Phno:user.Phno,Agent_id:agentSelected.Agent_id,Agent_type:agentSelected.Agent_type,Input:message,Output:chatCompletion.choices[0].message.content,time_Stamp:[Date,time],creditsDebited:1,agent_category:agentSelected.agent_Category})
-    console.log(chatInsert)
+    //const chatInsert = await client.db(dbName).collection(chat).insertOne({Phno:user.Phno,Agent_id:agentSelected.Agent_id,Agent_type:agentSelected.Agent_type,Input:message,Output:chatCompletion.choices[0].message.content,time_Stamp:[Date,time],creditsDebited:1,agent_category:agentSelected.agent_Category})
+    //console.log(chatInsert)
     console.log('inserted')
    return res.json({user:message,message:chatCompletion.choices[0].message.content})
     
@@ -392,6 +388,37 @@ app.post('/getUser',async(req,res)=>{
     client.close()
   }
   
+})
+
+app.post('/addChathHistory',async(req,res)=>{
+ 
+  console.log('history hit')
+  try{
+    const {agentId,message,PhoneNumber} = req.body
+    const todayDate = date.getDate()
+    const todayMonth = (date.getMonth()) + 1
+    const todayYear = date.getFullYear()
+    const hours = date.getHours()
+    const minutes = date.getMinutes() 
+    const Date = todayDate+'/'+todayMonth +"/"+todayYear
+    const time=hours+":"+minutes
+      main()
+      console.log(PhoneNumber)
+      const user = await client.db(dbName).collection(user_collection).findOne({Phno:PhoneNumber})
+      console.log('got user')
+      if (!user){
+        console.log('no user')
+        return res.status(404).json({message:"user not found"})
+      }
+      console.log('before add')
+      const result = await client.db(dbName).collection(chat).insert({Phno:PhoneNumber,Agent_id:agentId},{$set:{conversation:message,time_Stamp:[Date,time],creditsDebited:1}})
+      console.log(result)
+      return res.status(200).json({message:"Added to db"})
+  }catch(e){
+    console.log(e)
+  }finally{
+    client.close()
+  }
 })
 
 

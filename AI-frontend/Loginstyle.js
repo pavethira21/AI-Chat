@@ -33,7 +33,7 @@ export const styles = StyleSheet.create({
   card:{
     
     width: "150",
-    height:"200",
+    height:"160",
     backgroundColor: "#2A2A3A",
     marginLeft:10,
     padding: 16,
@@ -57,7 +57,7 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
   icon:{
-    color:'#BF00FF',
+    color:'#A357EF',
     position: "absolute",
     top: 10,
     left: 10,

@@ -24,12 +24,12 @@ export default function Register(){
     },[])
     
      
-   const IP_Address ='192.168.1.8'
+  const IP_Address ='192.168.1.5'
     const languages =['Tamil','Hindi','Kannada','Telugu','Marathi','Malayalam']
     const Occupation = ['College','Work','Home Maker','Teacher','Other']
     const [age,setAge] = useState('adult')
     const [name,setName] = useState()
-    const [lang,setLang] =useState()
+    const [lang,setLang] =useState()  
     const [Ocpt,setOcpt] = useState()
     const [inte,setInt] = useState()
     const [interest,setInterest] = useState([])
@@ -66,10 +66,10 @@ export default function Register(){
     }
     
     return(
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={{...styles.container}}>
         {lang ?
         <View>
-        <Text style={styles.cardText}>Fill Your Details</Text>
+        <Text style={{...styles.cardText,marginTop:50}}>Fill Your Details</Text>
         <View style={{display:"flex",padding:20,flexDirection:"row",width:'100%',borderRadius:20}} >
         <Pressable 
         style={{backgroundColor:(age =='adult'?'#A357EF':"#3B3E45"),padding:10,width:'50%',alignItems:'center',borderStartStartRadius:20,borderStartEndRadius:20}}
@@ -80,21 +80,33 @@ export default function Register(){
     </View>
     
         <Text style={styles.cardText}>What is your name?</Text>
-        <TextInput style={{borderWidth:2,borderColor:'#3B3E45'}} onChangeText={(e)=>{setName(e)}} value={name}></TextInput>
+        <TextInput style={{borderWidth:2,borderColor:'#3B3E45',color:'white'}} placeholderTextColor={'gray'} placeholder="Add your Name" onChangeText={(e)=>{setName(e)}} value={name}></TextInput>
+        
+        
+        {age =='adult' && <>
+            <Text style={styles.cardText}>What is your Occupation</Text>
+            <FlatList data={Occupation}  numColumns={3}  renderItem={({item})=>(
+               <View style={{padding:10}}>
+                    <TouchableOpacity  style={{alignItems:'center', borderRadius:20,backgroundColor:(Ocpt==item?'#A357EF':'#121526'),borderWidth:2,borderColor:'#A357EF',borderRadius:20}} onPress={()=>{setOcpt(item)}}>
+                        <Text style={{color:'white',padding:10}}>{item}</Text>
+                    </TouchableOpacity>
+              </View>
+            )} keyExtractor={(index) => index.toString()}/> 
+            </>
+        }
         <Text style={styles.cardText}>Interests</Text>
         <View style={{display:'flex',flexDirection:'row'}}>
-        <TextInput style={{borderWidth:2,borderColor:'#3B3E45',width:250}}  onChangeText={(e)=>{setInt(e)}} ></TextInput> 
-        <TouchableOpacity style={{padding:10,alignItems:'center',justifyContent:'center'}} onPress={()=>(setInterest(inte))}><Text style={{color:'white',textAlign:"center"}}>ADD</Text></TouchableOpacity>
+        <TextInput style={{borderWidth:2,borderColor:'#3B3E45',width:250,color:'white'}} placeholderTextColor={'gray'} placeholder="Add your interest"  onChangeText={(e)=>{setInt(e)}} ></TextInput> 
+        <TouchableOpacity style={{padding:10,alignItems:'center',justifyContent:'center',}} onPress={()=>(setInterest((prev)=>[...prev,inte]))}><Text style={{color:'white',textAlign:"center"}}>ADD</Text></TouchableOpacity>
         </View> 
+        {interest &&
+        <FlatList data={interest} numColumns={6} renderItem={({item})=>(
+            <View>
+                <Text onPress={()=>removeItem(item)} style={{color:'white',padding:10}}>{item}</Text>
+            </View>
+        )}/>  
+        }
         
-        <Text style={styles.cardText}>What is your Occupation</Text>
-        <FlatList data={Occupation}  numColumns={3}  renderItem={({item})=>(
-           <View style={{padding:10}}>
-                <TouchableOpacity  style={{alignItems:'center', borderRadius:20,backgroundColor:(Ocpt==item?'#A357EF':'#121526'),borderWidth:2,borderColor:'#A357EF',borderRadius:20}} onPress={()=>{setOcpt(item)}}>
-                    <Text style={{color:'white',padding:10}}>{item}</Text>
-                </TouchableOpacity>
-          </View>
-        )} keyExtractor={(item, index) => index.toString()}/> 
         
         
         <TouchableOpacity onPress={handleRegister} style={styles.button}><Text>Continue</Text></TouchableOpacity>
@@ -103,7 +115,7 @@ export default function Register(){
            :
         
              <View>
-             <Text style={styles.cardText}>What is Your Native Language?</Text>
+             <Text style={{...styles.cardText,marginTop:50}}>What is Your Native Language?</Text>
                 <FlatList data={languages} renderItem={({item,index})=>(
                    <View key={index} style={{padding:10}}>
                         <TouchableOpacity  style={{borderWidth:2,borderColor:'#A357EF',padding:10,width:'90%',borderRadius:20,alignItems:'centre', backgroundColor:(lang==item?'#A357EF':'#121526')}} onPress={()=>{setLang(item)}}>

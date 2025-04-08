@@ -8,6 +8,7 @@ import Subcription from './subcription';
 
 export default function BottomNavigate() {
     const Tab = createBottomTabNavigator();
+    
   return (
     <Tab.Navigator screenOptions={{headerShown:false,tabBarActiveTintColor:'#A357EF',tabBarInactiveTintColor:'gray',tabBarActiveBackgroundColor:'#121526',tabBarInactiveBackgroundColor:'#121526'}} >
       <Tab.Screen
@@ -15,11 +16,12 @@ export default function BottomNavigate() {
     component={Home}
    
     options={{
+      unmountOnBlur:true,
       tabBarIcon: ({size,focused}) => focused?<Ionicons name="home" color={'#A357EF'} size={size} />:<Ionicons name="home-outline" color={'gray'} size={size} />
       
     }}
   />
-      <Tab.Screen name="Chat" component={Chat}
+      <Tab.Screen name="Chat History" component={Chat}
       options={{tabBarIcon :({size,focused}) => focused?<Ionicons name="chatbubbles" color={'#A357EF'} size={size} />:<Ionicons name="chatbubbles-outline" color={'gray'} size={size} />}}
       />
       <Tab.Screen name="Premium" component={Subcription} 

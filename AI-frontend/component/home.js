@@ -19,6 +19,7 @@ export default function Home(){
     const [PhoneNumber,setPhoneNumber] = useState()
     useEffect(()=>{
         getStored()
+        
     },[])
 
     async function getStored(){
@@ -31,8 +32,11 @@ export default function Home(){
     
     //const IP_Address= process.env.IP_Address
     const navigation = useNavigation()
+
+   
+
     const [agents ,setAgents] = useState([])
-    const IP_Address ='192.168.1.8'
+   const IP_Address ='192.168.1.5'
 
     console.log(IP_Address)
     async  function handleAgent(item){
@@ -73,15 +77,15 @@ export default function Home(){
              <HeaderTag></HeaderTag>
              <Text>{PhoneNumber ? `Phone Number: ${PhoneNumber}` : 'No phone number stored'}</Text>
 
-             <Image source={require("../assets/character.png")} style={{width:150,height:150,borderRadius:20 }}></Image>
-             <Text style={{...styles.cardText,marginBottom:20}}>Hi Im your english Tutor!</Text>
+             <Image source={require("../assets/Home.png")} style={{width:300,height:200,borderRadius:20 }}></Image>
+             
              <FlatList data={agents} numColumns={2}  renderItem={({item,index}) =>(
                  <TouchableOpacity onPress={()=>{handleAgent(item)}} key={index} style={styles.card}>
                  <Ionicons style={styles.icon}  name={item.icon} size={25} />
              
              <Text style={styles.cardText}>{item.Name}</Text>
-             <Text style ={styles.description} >{item.Description}</Text>
-             <Ionicons style={{color:'#B0B0C3'}} size={20} name={"arrow-redo"}></Ionicons>
+             <Text numberOfLines={2} style ={styles.description} >{item.Description}</Text>
+             <Ionicons style={{color:'#A357EF',position:"absolute",bottom:5,right:5}} size={20} name={"arrow-forward-circle-outline"}></Ionicons>
              </TouchableOpacity>
                  
              )

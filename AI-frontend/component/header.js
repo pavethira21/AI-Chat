@@ -11,14 +11,21 @@ import { Dimensions } from 'react-native';
 
 
 function HeaderTag () {
-    const [phoneNumber,setPhoneNumber] = useState()
+   
     const [credit,setCredit] = useState()
-     const IP_Address ='192.168.1.8'
+     const IP_Address ='192.168.1.5'
     const navigation = useNavigation()
-    useEffect(()=>{
-        
+
+    useEffect(() => {
+      handleCredit()
+      const unsubscribe = navigation.addListener('tabPress', (e) => {
+        console.log('Profile Screen Focused');
         handleCredit()
-    },[])
+      });
+  
+      return unsubscribe;
+    }, [navigation]);
+
     function handleNavigate(){
         navigation.navigate('Profile')
        }
@@ -44,7 +51,7 @@ function HeaderTag () {
     <View style={{backgroundColor:'#121526',flexDirection:'row',width:'100%'}}>
       {credit&&console.log(credit)}
       <TouchableOpacity  onPress={handleNavigate}  style={{height:50,width:50,position:'absolute',left:0}}>
-     <Text style={{color:'white'}}><Ionicons name={'person'} color={'orange'} size={25}/></Text>
+     <Text><Ionicons name={'person-circle-outline'} color={'orange'} size={25}/></Text>
       </TouchableOpacity>
       <View style={{color:'white',position:'absolute',right:0,flexDirection:'row'}}>
         <Ionicons name={'star'} color={'orange'} size={25}></Ionicons>

@@ -9,7 +9,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 function Subcription ()  { 
   const [visible,setVisible] = useState()
   const [item,setItem] = useState()
- const IP_Address ='192.168.1.8'
+  const [showSubList,setSub] = useState('subscribe')
+ const IP_Address ='192.168.1.5'
  
   const subscribe = [{'title':"Quaterly Plan",period:"3 months",Description:"Enjoy Unlimited access to AI-chat for 3 Months and Improve Your english Skills",Price:'$6.99'},
     {"title":"Half Year Plan",period:"6 months",Description:"Enjoy Unlimited access to AI-chat for 3 Months and Improve Your english Skills",Price:'$10.00'},
@@ -75,34 +76,46 @@ function Subcription ()  {
         <View style={{alignItems:"center"}}>
         <Image  source={require('../assets/subcribe.png')} style={{width:"200",height:'200',borderRadius:20, }}/>
         </View>
+        <View style={{display:"flex",padding:20,flexDirection:"row",width:'100%',borderRadius:20}} >
+        <Pressable onPress={()=>(setSub('subscribe'))}
+        style={{backgroundColor:"#3B3E45",padding:10,width:'50%',alignItems:'center',borderBottomWidth:2,borderColor:(showSubList=='subscribe' ? '#A357EF':'gray')}}
+         ><Text style={{color:'white'}}>Subcriptions</Text></Pressable> 
+        <Pressable onPress={()=>(setSub('credit'))}
+        style={{backgroundColor:"#3B3E45",padding:10,width:'50%',alignItems:'center',borderBottomWidth:2,borderColor:(showSubList=='credit' ? '#A357EF':'gray')}} 
+        ><Text style={{color:'white'}}>Purchase Credit</Text></Pressable>
+        </View>
+        
+       {showSubList =='subscribe' ?
+       <FlatList data={subscribe}  renderItem={({item,index})=>
+        (
+          
+          
+        <Pressable 
+        style={{maxHeight:300,backgroundColor:'#A357EF',margin:20,alignItems:'center',borderRadius:20,padding:20}} >
+      <Text style={{fontSize:25,fontWeight:700}} >{item.title}</Text>
+      <Text>{item.Description}</Text>
+      </Pressable>
+          
+        )
+      
        
-        <FlatList data={subscribe} renderItem={({item,index})=>
-          (
-            
-            
-          <Pressable 
-          style={{maxHeight:300,backgroundColor:'#A357EF',margin:20,alignItems:'center',borderRadius:20,padding:20}} >
-        <Text style={{fontSize:25,fontWeight:700}} >{item.title}</Text>
-        <Text>{item.Description}</Text>
-        </Pressable>
-            
-          )
+      }/>:
+      <FlatList data={credit} renderItem={({item,index})=>
+        (
+           
+        <Pressable onPress={()=>(setVisible(true),setItem(item))} 
+        style={{maxHeight:300,backgroundColor:'#A357EF',margin:20,alignItems:'center',borderRadius:20,padding:20}} >
+      <Text style={{fontSize:25,fontWeight:700}} >{item.title}</Text>
+      <Text ><FontAwesome5 name="rupee-sign" size={10}  />{item.price}</Text>
+      </Pressable>
+          
+        )
+      
+       
+      }/>
+       }
         
-         
-        }/>
-        <FlatList data={credit} renderItem={({item,index})=>
-          (
-             
-          <Pressable onPress={()=>(setVisible(true),setItem(item))} 
-          style={{maxHeight:300,backgroundColor:'#A357EF',margin:20,alignItems:'center',borderRadius:20,padding:20}} >
-        <Text style={{fontSize:25,fontWeight:700}} >{item.title}</Text>
-        <Text ><FontAwesome5 name="rupee-sign" size={10}  />{item.price}</Text>
-        </Pressable>
-            
-          )
         
-         
-        }/>
 
         
 
