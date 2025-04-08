@@ -270,14 +270,25 @@ app.post ('/agentSpeech',upload.single('audio'),async(req,res)=>{
 app.post('/getChat',async(req,res)=>{
   try{
     main()
-  const {PhoneNumber} =req.body
+    let chats;
+  const {PhoneNumber,agentId} =req.body
   if(!PhoneNumber){
     return res.json({message:"Details not enough"})
   }
-
-  const chats = await client.db(dbName).collection(chat).find({Phno:PhoneNumber},
+ if(agentId){
+  console.log(' agent id')
+   chats = await client.db(dbName).collection(chat).find({Phno:PhoneNumber,Agent_id:agentId},
     {projection:{conversation:1,time_Stamp:1,_id:0,Agent_id:1}}).sort({time_Stamp:-1}).toArray()
-    console.log("chats",chats[9])
+ }else{
+  console.log('no agent id')
+  chats = await client.db(dbName).collection(chat).find({Phno:PhoneNumber},
+    {projection:{conversation:1,time_Stamp:1,_id:0,Agent_id:1}}).sort({time_Stamp:-1}).toArray()
+ }
+ 
+  //const agent_name = await client.db(dbName).collection(agent).findOne({Agent_id:chats[0].Agent_id},{projection:{_id:0,Name:1}})
+ // console.log(chats[0].Agent_id)
+  console.log("chats",chats)
+  
   if(!chats){
     return res.json({message:"chats not found"})
   }
@@ -411,8 +422,8 @@ app.post('/addChathHistory',async(req,res)=>{
         return res.status(404).json({message:"user not found"})
       }
       console.log('before add')
-      const result = await client.db(dbName).collection(chat).insert({Phno:PhoneNumber,Agent_id:agentId},{$set:{conversation:message,time_Stamp:[Date,time],creditsDebited:1}})
-      console.log(result)
+      const result = await client.db(dbName).collection(chat).insertOne({Phno:PhoneNumber,Agent_id:agentId,conversation:message,time_Stamp:[Date,time],creditsDebited:1})
+      console.log(result) 
       return res.status(200).json({message:"Added to db"})
   }catch(e){
     console.log(e)

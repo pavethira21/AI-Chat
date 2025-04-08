@@ -28,6 +28,8 @@ export default function Agent({route}){
 
             });
         } 
+
+
     }, [chat]);
     
 
@@ -133,12 +135,16 @@ export default function Agent({route}){
     }
 
     async function handleNavigate(){
+        try{
+            console.log('handlenavigate')
         const phoneNumber = await  AsyncStorage.getItem('PhoneNumber')
         console.log('hit')
         if(responses.length<1){
-            navigation.navigate('BtNv')
+            console.log('no convo')
+            navigation.navigate('BtNv') 
         }
         else{
+            console.log('convos available')
             const input = {agentId:item,message:responses,PhoneNumber:phoneNumber}
         const addDb = await fetch(`http://${IP_Address}:5000/addChathHistory`,{
             method:"POST",
@@ -150,6 +156,10 @@ export default function Agent({route}){
             navigation.navigate('BtNv')
         }
         }
+        }catch(e){
+            console.log(e)
+        }
+        
     
         
     }
@@ -188,14 +198,15 @@ export default function Agent({route}){
         <SafeAreaView style={styles.container}>
             <View style={{backgroundColor:'#121526',flexDirection:'row',width:'100%',margin:20}}>
                  
-                  {/* <TouchableOpacity  onPress={handleNavigate}  style={{height:50,width:50,position:'absolute',left:0,backgroundColor:'orange',alignItems:'center',justifyContent:'center',borderRadius:20}}>
+                <TouchableOpacity  onPress={handleNavigate}  style={{height:50,width:50,position:'absolute',left:0,backgroundColor:'orange',alignItems:'center',justifyContent:'center',borderRadius:20}}>
                  <Text style={{color:'white'}}><Ionicons name={'arrow-back-outline'} color={'black'} size={25}/></Text>
-                  </TouchableOpacity> */}
+                  </TouchableOpacity> 
                   
-                </View>
+                </View> 
            
                 
                 <View style={{flex:1,padding:10,marginTop:25}}>
+                    
                     {responses.length>=1?
                     <FlatList data={responses}  renderItem={({item,index})=>(
 
