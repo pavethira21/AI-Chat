@@ -36,16 +36,20 @@ function SubUsers () {
              
              
              <View style={{marginTop:10,height:5,width:'100%',backgroundColor:'gray'}}/>
-<Pressable onPress={handleNavigate} style={{padding: 12,marginTop: 30,backgroundColor: "white",alignSelf: "center",borderRadius: 10,elevation: 3,}}>
-  <Text style={{ fontSize: 16, fontWeight: "500" }}>English at Office</Text>
-  </Pressable>
+             <Text style={{color:'white', fontSize: 16, fontWeight: "500" }}>English at Office</Text>
+             <View>
+             <View style={{color:'#2A2A3A'}}>
+              <Text style={{color:'white'}}>Discuss about the upcoming launch of your product</Text>
+              
+              </View>
+              </View>
+             <View style={{marginTop:10,height:3,width:'100%',backgroundColor:'gray'}}/>
   
-  <Pressable onPress={handleNavigate} style={{padding: 12,marginTop: 30,backgroundColor: "white",alignSelf: "center",borderRadius: 10,elevation: 3,}}>
-  <Text style={{ fontSize: 16, fontWeight: "500" }}>Basic english at restaurant</Text>
-  </Pressable>
-  <Pressable onPress={handleNavigate} style={{padding: 12,marginTop: 30,backgroundColor: "white",alignSelf: "center",borderRadius: 10,elevation: 3,}}>
-  <Text style={{ fontSize: 16, fontWeight: "500" }}>Basic english while shopping</Text>
-  </Pressable>
+              <Text style={{color:'white', fontSize: 16, fontWeight: "500" }}>Basic english at restaurant</Text>
+              <View style={{marginTop:10,height:3,width:'100%',backgroundColor:'gray'}}/>
+  
+  <Text style={{color:'white', fontSize: 16, fontWeight: "500" }}>Basic english while shopping</Text>
+  <View style={{marginTop:10,height:3,width:'100%',backgroundColor:'gray'}}/>
 </SafeAreaView> 
   )
 }
