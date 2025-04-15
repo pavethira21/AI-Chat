@@ -4,22 +4,46 @@ import {Ionicons} from '@expo/vector-icons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { styles } from '../Loginstyle'
 import { useNavigation } from '@react-navigation/native';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
 
 function Subcription ()  { 
   const [visible,setVisible] = useState()
   const [item,setItem] = useState()
   const [showSubList,setSub] = useState('subscribe')
- const IP_Address ='192.168.1.5'
+ const IP_Address ='192.168.1.11'
  
-  const subscribe = [{'title':"Quaterly Plan",period:"3 months",Description:"Enjoy Unlimited access to AI-chat for 3 Months and Improve Your english Skills",Price:'$6.99'},
-    {"title":"Half Year Plan",period:"6 months",Description:"Enjoy Unlimited access to AI-chat for 3 Months and Improve Your english Skills",Price:'$10.00'},
-    {"title":"Around the Clock Plan",period:"12 months",Description:"Enjoy Unlimited access to AI-chat for 3 Months and Improve Your english Skills",Price:'$4.99'}]
+  const subscribe = [{'title':"Quaterly Plan",period:90,color:['#4286f4', '#4364F7'],Description:["Enjoy Unlimited access to AI-chat for 3 Months and Improve Your english Skills","Ask AI Using Voice and Chat"],Price:'$6.99'},
+    {"title":"Half Year Plan",period:183,color:['#ED213A', '#93291E'],Description:["Enjoy Unlimited access to AI-chat for 3 Months and Improve Your english Skills"],Price:'$10.00'},
+    {"title":"Around the Clock Plan",color:['#ad5389', '#3c1053'],period:365,Description:["Enjoy Unlimited access to AI-chat for 3 Months and Improve Your english Skills"],Price:'$4.99'}]
 
     const credit =[{id:1,title:"Buy 25 Credits",price:"100",credit:25},{id:2,title:"Buy 50 Credits",price:"100",credit:50},{id:3,title:"Buy 100 Credits",price:"250",credit:100},
       {id:4,title:"Buy 500 Credits",price:"1000",credit:500}
     ]
  // const navigation = useNavigation()
+ async function handleSubscribe(i){ 
+  console.log('inside subscribe')
+  const PhoneNumber = await AsyncStorage.getItem("PhoneNumber")
+   const input = {Phno:PhoneNumber,days:i}
+
+   const result = await fetch(`http://${IP_Address}:5000/subscription`,{
+    method:"POST",
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify(input)
+   })
+
+   if(result.status == 200){
+    ToastAndroid.showWithGravity(" Subscribed successfully",ToastAndroid.SHORT,
+                            ToastAndroid.BOTTOM)
+  }
+
+   
+  else{
+    ToastAndroid.showWithGravity(`Could Not add subscription  `,ToastAndroid.SHORT,
+      ToastAndroid.BOTTOM)
+  }} 
+ 
   async function handlePress(){
     setVisible(false) 
     console.log(IP_Address)
@@ -89,25 +113,32 @@ function Subcription ()  {
        <FlatList data={subscribe}  renderItem={({item,index})=>
         (
           
-          
-        <Pressable 
-        style={{maxHeight:300,backgroundColor:'#A357EF',margin:20,alignItems:'center',borderRadius:20,padding:20}} >
-      <Text style={{fontSize:25,fontWeight:700}} >{item.title}</Text>
-      <Text>{item.Description}</Text>
+          <LinearGradient colors={item.color}
+        style={{ flex: 1,margin:20,alignItems:'center',borderRadius:20,padding:20 }}>
+        <Pressable  style={{alignItems:'center'}}>
+        
+      <Text style={{color:'white',fontSize:25,fontWeight:700,margin:20,alignSelf:'center'}} >{item.title}</Text>
+      {/* <Image source={require('../assets/')}></Image> */}
+      <Text style={{color:"white",fontSize:15}}><Ionicons name='checkmark-done-sharp' size={20}/> {item.Description[0]}</Text>
+      <Text style={{color:"white",fontSize:15}}><Ionicons name='checkmark-done-sharp' size={20}/> {item.Description[1]}</Text>
+      <Pressable style={{backgroundColor:''}} onPress={()=>handleSubscribe(item.period)}><Text style={{color:"white",fontSize:20}}>Choose Plan</Text></Pressable>
       </Pressable>
+      </LinearGradient>
           
         )
       
        
       }/>:
-      <FlatList data={credit} renderItem={({item,index})=>
+      <FlatList data={credit} renderItem={({item}) =>
         (
-           
+        <LinearGradient colors={['#4286f4', '#4364F7']}
+        style={{ flex: 1,maxHeight:300,margin:20,borderRadius:20,padding:20 }}>
         <Pressable onPress={()=>(setVisible(true),setItem(item))} 
-        style={{maxHeight:300,backgroundColor:'#A357EF',margin:20,alignItems:'center',borderRadius:20,padding:20}} >
+        style={{alignItems:'center'}} >
       <Text style={{fontSize:25,fontWeight:700}} >{item.title}</Text>
       <Text ><FontAwesome5 name="rupee-sign" size={10}  />{item.price}</Text>
       </Pressable>
+      </LinearGradient> 
           
         )
       

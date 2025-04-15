@@ -1,9 +1,9 @@
-import { FlatList, FlatListComponent, Text,TouchableOpacity,View } from "react-native"
+import { FlatList, FlatListComponent, Text,TouchableOpacity,View,SafeAreaView } from "react-native"
 import { styles } from "../Loginstyle"
 import { Image } from "react-native"
 import { useEffect, useState } from "react"
 
-import { SafeAreaView } from "react-native-safe-area-context"
+
 import Config from 'react-native-config';
 import {Ionicons} from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native"
@@ -36,7 +36,7 @@ export default function Home(){
    
 
     const [agents ,setAgents] = useState([])
-   const IP_Address ='192.168.1.5'
+   const IP_Address ='192.168.1.11'
 
     console.log(IP_Address)
     async  function handleAgent(item){

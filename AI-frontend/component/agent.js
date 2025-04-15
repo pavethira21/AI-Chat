@@ -1,11 +1,15 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View,Text,Image, TextInput, TouchableOpacity, KeyboardAvoidingView, FlatList, ScrollView } from 'react-native';
+import { View,Text,Image, TextInput, TouchableOpacity, KeyboardAvoidingView, FlatList, ScrollView, Pressable,Share,ToastAndroid } from 'react-native';
 import { styles } from '../Loginstyle';
 import {Audio} from 'expo-av';
 import { SafeAreaView } from 'react-native';
 import {Ionicons} from '@expo/vector-icons';
 import { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import * as clipboard from 'expo-clipboard';
+import * as sharing from 'expo-sharing';
+import { ActivityIndicator } from 'react-native';
+
 
 export default function Agent({route}){
     const [responses , setResponses] = useState([])
@@ -13,7 +17,7 @@ export default function Agent({route}){
     const [loading,setLoading] = useState(false)
     const [message,setMessage] = useState()
     const navigation = useNavigation()
-    const [item,setItem] = useState()
+    const [agent,setItem] = useState()
     const [recording,setRecording] = useState()
     
     const chat = route?.params?.chat
@@ -21,7 +25,7 @@ export default function Agent({route}){
     useEffect(() => {
         console.log('useffect',chat)
         if (chat) {  
-            console.log('insideif');
+            console.log('insideif')
             chat.forEach((item) => {
                 console.log("Inside if", item);
                 setResponses(prev =>[...prev,item]);
@@ -55,12 +59,8 @@ export default function Agent({route}){
         }
     }
 
-    // useEffect(()=>{
-        
-        
-    
-    // },[])
-     const IP_Address ='192.168.1.5'
+   
+     const IP_Address ='192.168.1.11'
 
    
 
@@ -111,7 +111,7 @@ export default function Agent({route}){
   
         
         console.log('Recording stopped and stored at', uri)
-        const input = {PhoneNumber:PhoneNumber,agentId:item}
+        const input = {PhoneNumber:PhoneNumber,agentId:agent}
         formData.append('input', JSON.stringify(input));
             const res = await fetch(`http://${IP_Address}:5000/agentSpeech`,
                 {
@@ -145,7 +145,7 @@ export default function Agent({route}){
         }
         else{
             console.log('convos available')
-            const input = {agentId:item,message:responses,PhoneNumber:phoneNumber}
+            const input = {agentId:agent,message:responses,PhoneNumber:phoneNumber}
         const addDb = await fetch(`http://${IP_Address}:5000/addChathHistory`,{
             method:"POST",
             headers:{'content-type':'application/json'},
@@ -170,8 +170,8 @@ export default function Agent({route}){
         console.log('inside chat')
         console.log("mes",message)
         
-        if(message?.length >=5){
-            const input = {agentId:item,type:'text',message:message,PhoneNumber:PhoneNumber}
+        if(message?.length >=3){
+            const input = {agentId:agent,type:'text',message:message,PhoneNumber:PhoneNumber}
             
         let res = await fetch(`http://${IP_Address}:5000/agent`,{
             method:"POST",
@@ -187,11 +187,34 @@ export default function Agent({route}){
        
         
     }
-    
 
+    async function handleCopy(i){
+        console.log('inside copy')
+        try{
+            console.log('inside try')
+            await clipboard.setStringAsync(i)
+            console.log('after copy')
+            ToastAndroid.showWithGravity("Copied to clipboard",ToastAndroid.SHORT,
+                                        ToastAndroid.BOTTOM)
 
-    
-    
+        }
+        catch(e){
+            console.log(e)
+        }
+        
+    }
+
+    async function handleShare(i){
+        console.log('inside share')
+        try{
+            console.log('inside try')
+            const shared =  Share.share({message:i})
+        }catch(e){
+            console.log(e)
+        }
+        
+
+    }
     return(
         <>
         {responses && console.log("responses",responses)}
@@ -199,8 +222,10 @@ export default function Agent({route}){
             <View style={{backgroundColor:'#121526',flexDirection:'row',width:'100%',margin:20}}>
                  
                 <TouchableOpacity  onPress={handleNavigate}  style={{height:50,width:50,position:'absolute',left:0,backgroundColor:'orange',alignItems:'center',justifyContent:'center',borderRadius:20}}>
-                 <Text style={{color:'white'}}><Ionicons name={'arrow-back-outline'} color={'black'} size={25}/></Text>
-                  </TouchableOpacity> 
+                 <Text style={{color:'white'}}>
+                    <Ionicons name={'arrow-back-outline'} color={'black'} size={25}/>
+                </Text>
+                </TouchableOpacity> 
                   
                 </View> 
            
@@ -213,7 +238,7 @@ export default function Agent({route}){
                        
                         <View key={index} style={{padding:10,marginBottom:15}}>
                             
-                             {(console.log('user',item.user,"messAGE",item.message))}
+                             
                        
                         <View style={{backgroundColor:'#A357EF',padding:10,elevation:10,marginBottom:5,borderRadius:20}}>
                         <Text style={{color:'white',padding:10}}>{item.user }</Text>
@@ -223,35 +248,38 @@ export default function Agent({route}){
                         <View  style={{backgroundColor:'#3B3E45'
                             ,borderBottomLeftRadius:20,borderBottomRightRadius:20,borderTopRightRadius:20,elevation:9,marginRight:30
                         }}>
-
+                        
                         <Text style={{color:"white" , padding:10,marginBottom:10}}>{item.message}</Text>
-
+                        { agent == '7' &&( <View style={{flexDirection:'row'}}>
+                             <Pressable style={{backgroundColor:'gray',padding:5,alignItems:'center',marginLeft:20,borderRadius:10,marginBottom:10,right:10}}
+                              onPress={()=>handleCopy(item.message)}>
+                                <Ionicons name='copy' size={18} color={'white'}></Ionicons>
+                            
+                            </Pressable> 
+                            <Pressable style={{backgroundColor:'gray',padding:5,alignItems:'center',marginLeft:20,borderRadius:10,marginBottom:10}} onPress={()=>handleShare(item.message)}>
+                                <Ionicons name='share' size={18} color={'white'}></Ionicons>
+                                </Pressable>
+                            </View>)}
                         </View>
-                        {(loading&&<Text style={{color:'white'}}>Ai fetching....</Text>)} 
+                        
                         </View>
                         
                         
                         
                         </View> 
-                        
+                         
                     )}/>
                     : 
                     <>
-                    <Image source={require("../assets/character.png")} style={{width:"200",height:'200',borderRadius:20 }}></Image>
-                    <Text style={{color:'white'}}>ask me anything</Text></>}
-                    {chat&&
-                    <>
-
-                    {/* <FlatList data={chat } renderItem={({item,index})=>(
-                        console.log("items",index,item.conversation),
-
-                        <Text style={{color:'white'}}>{item.time_Stamp}</Text>
-    )}/> */}
+                    <View style={{flexDirection:'row',alignItems:'center'}}>
+                    <Image source={require("../assets/chat-image.png")} style={{width:"150",height:'150' }}></Image>
+                    <Text style={{color:'white'}}>Hello I will Help You With {agent} </Text>
+                    </View> 
+                    </>}
                     
-                    </>
-                    }
                
                </View>
+               {(loading&&<ActivityIndicator size='large'>loading...</ActivityIndicator>)} 
                 <KeyboardAvoidingView style={{flexDirection:'row',gap:10,padding:20,backgroundColor:'#121526'}} >
                     
                     <TextInput multiline={true} style={{backgroundColor:'white',width:'320',borderStartStartRadius:10,borderEndStartRadius:10}} value={message} onChangeText={(e)=>{setMessage(e) }}  ></TextInput>

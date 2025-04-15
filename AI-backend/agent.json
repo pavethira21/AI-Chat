@@ -88,7 +88,7 @@
 "Name":"Write an Essay",
 "Description":"Helps You to write an essay on any topic",
 "Agent_type":"Text",
-"Prompt":"Translate the message from tamil to english ,the reply from assistant  should be in english  and then Write an essay for  the given message. Do Not do other task only write Essay",
+"Prompt":"Translate the message from tamil to english ,the reply from assistant  should be in english  and then Write an essay for  the given message.Do not show the translated text, Do Not do other task only write Essay",
 "Temperature":0.5,
 "Max_token":1024,
 "Credits":1,

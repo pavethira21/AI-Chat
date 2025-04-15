@@ -1,14 +1,16 @@
 import { SafeAreaView,View, Text, TextInput, Touchable, TouchableOpacity,ToastAndroid } from "react-native"
 import { useNavigation } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
 import { Image } from "react-native";
 import {styles} from '../Loginstyle';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEffect, useState } from "react";
+//import SendSMS from 'react-native-sms';
+import {useState} from 'react'
 import {Ionicons} from '@expo/vector-icons';
-import Register from "./registration";
+
 
 export default function Login(){
-    const IP_Address ='192.168.1.5'
+    const IP_Address ='192.168.1.11'
     const [phoneNumber,setPhNo] = useState()
     const [isValid,setValid] = useState(false)
     const [Otp,setOtp]= useState()
@@ -16,7 +18,11 @@ export default function Login(){
     const [token,setToken] = useState()
     const [message,setMessage] = useState()
     let pattern = /^[6-9]\d{9}$/
+    
     const navigation = useNavigation()
+
+
+
 
    
     function isValidPhoneNumber(num){
@@ -83,9 +89,14 @@ export default function Login(){
                 method:"POST",
                 headers:{'content-type':'application/json'},
                 body:JSON.stringify(inputValue)
-              }).then(response => response.json())
-              .then(data=>{ setMessage(data.message)})
+              })
+            //   .then(response => response.json())
+            //   .then(data=>{ setMessage(data.message)})
+              const data = await res.json()
+              setMessage(data.message)
+
             if(res.status==200){
+                console.log('1')
                 ToastAndroid.showWithGravity(message,ToastAndroid.SHORT,
                     ToastAndroid.BOTTOM)
                 console.log('hello')
@@ -100,6 +111,7 @@ export default function Login(){
     }
     
     return(
+        
         <SafeAreaView style={styles.container} >
         
             {message&& console.log(message)}
@@ -115,7 +127,7 @@ export default function Login(){
             
             <View>
             <Text style={{...styles.cardText,marginBottom:20}} >OTP</Text>
-            <View style={{display:"flex",flexWrap:"wrap",flexDirection:'row',marginBottom:20,borderWidth:2,borderColor:'#A357EF',borderRadius:20,backgroundColor:'#121526'}}>
+            <View style={{display:"flex",flexWrap:"wrap",flexDirection:'row',marginBottom:20,borderWidth:1,borderColor:'gray',borderRadius:20,backgroundColor:'#121526'}}>
             <TextInput placeholderTextColor={'gray'} 
             style={{borderRadius:10,width:'100%',color:'white',borderWidth:1,borderColor:'#A357EF',borderRadius:20,backgroundColor:'#121526'}} placeholder="Enter Generated  Otp" 
             value={Otp}  
@@ -125,7 +137,12 @@ export default function Login(){
             
             
         </View>
-        <TouchableOpacity style={{...styles.button,marginTop:20}} onPress={handleVerify} ><Text>verify OTP</Text></TouchableOpacity>
+        <LinearGradient style={{...styles.button,marginTop:20}}
+      colors={['#6A3E9F', '#9B59B6']} // Purple gradient colors
+      
+    >
+        <TouchableOpacity  onPress={handleVerify} >
+            <Text>verify OTP</Text></TouchableOpacity></LinearGradient>
         </>:
         // message=="user not found"?<>
         // <Register/>
@@ -133,7 +150,7 @@ export default function Login(){
         <>
         <View >
             <Text style={{...styles.cardText,marginBottom:20}}>What's Your PhoneNumber?</Text>
-            <View style={{display:"flex",flexWrap:"wrap",flexDirection:'row',marginBottom:20,borderWidth:2,borderColor:'#A357EF',borderRadius:20,backgroundColor:'#121526'}}>
+            <View style={{display:"flex",flexWrap:"wrap",flexDirection:'row',marginBottom:20,borderWidth:1,borderColor:"gray",borderRadius:20,backgroundColor:'#121526'}}>
                 
                 <TextInput
                 style={{borderRadius:10,width:'85%',color:'white',}}
@@ -151,12 +168,16 @@ export default function Login(){
                 
             </View>
             </View>
-            
-            <TouchableOpacity style={styles.button} onPress={handleSubmit}><Text style={{color:"white"}}>Generate OTP </Text></TouchableOpacity>
+            <LinearGradient
+      colors={['#6A3E9F', '#9B59B6']} 
+      style={styles.button} 
+    >
+            <TouchableOpacity  onPress={handleSubmit}><Text style={{color:"white"}}>Generate OTP </Text></TouchableOpacity></LinearGradient>
         </>
             } 
                    
         </SafeAreaView>
+      
        
         
     )

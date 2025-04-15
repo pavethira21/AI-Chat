@@ -9,7 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function Profile  ()  {
     const [user,setUser] = useState()
-     const IP_Address ='192.168.1.5'
+     const IP_Address ='192.168.1.11'
     const navigation = useNavigation()
     useEffect(()=>{
         handleGetUser()

@@ -13,7 +13,7 @@ import { Dimensions } from 'react-native';
 function HeaderTag () {
    
     const [credit,setCredit] = useState()
-     const IP_Address ='192.168.1.5'
+     const IP_Address ='192.168.1.11'
     const navigation = useNavigation()
 
     useEffect(() => {
@@ -48,7 +48,7 @@ function HeaderTag () {
     }  
    
   return (
-    <View style={{backgroundColor:'#121526',flexDirection:'row',width:'100%'}}>
+    <View style={{backgroundColor:'#121526',flexDirection:'row',marginTop:20,width:'100%'}}>
       {credit&&console.log(credit)}
       <TouchableOpacity  onPress={handleNavigate}  style={{height:50,width:50,position:'absolute',left:0}}>
      <Text><Ionicons name={'person-circle-outline'} color={'orange'} size={25}/></Text>

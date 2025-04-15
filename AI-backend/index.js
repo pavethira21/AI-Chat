@@ -5,7 +5,9 @@ const dotenv = require('dotenv')
 const Groq = require('groq-sdk')
 const jwt = require('jsonwebtoken')
 const path = require('path')
+const Joi = require('joi');
 const multer = require('multer')
+const moment = require('moment')
 const fs = require('fs')
 const formData = require('form-data')
 const cors = require('cors')
@@ -37,9 +39,52 @@ async function main(){
     }catch(e){console.error(e)}
 }  
 
+app.post('/subscription',async(req,res)=>{
+  const {Phno,days} = req.body 
+  
+  const todayDate = date.getDate()
+  const todayMonth = (date.getMonth()) + 1
+  const todayYear = date.getFullYear()
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+ 
+  endDate= d.getDate() +"/"+(d.getMonth()+1 )+"/"+d.getFullYear()
+  console.log(endDate)
+  const createdDate = todayDate+'/'+todayMonth +"/"+todayYear
+  try{
+    main()
+
+    const result = await client.db(dbName).collection(user_collection).updateOne({Phno:Phno},{$set:{subcription:{Status:'Active',startDate:createdDate,nextRenew:endDate}}})
+    if(result){
+
+      return res.status(200).json({message:"Subscribed"})
+    }
+    else{
+      return res.status(400).json({message:"error subscribing"})
+    }
+  }catch(e){
+    console.log('error',e)
+  }
+})
+
 
 app.post('/login',async(req,res)=>{
-    const {PhoneNumber} = req.body
+  const schema = Joi.object({
+    PhoneNumber: Joi.string()
+      .pattern(/^[6-9]\d{9}$/).required()
+      .messages({
+        'string.pattern.base': 'Enter alid phone Number',
+        'string.empty': 'Phone number is required',
+      }),
+  });
+
+  const { error, value } = schema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
+  const { PhoneNumber } = value;
     try{
       if (PhoneNumber?.length==10){
      
@@ -48,7 +93,7 @@ app.post('/login',async(req,res)=>{
             encoding: 'base32'
           });
           console.log(token)
-         res.status(200).json({message:"Verification code Generated"})
+         return res.status(200).json({message:"Verification code Generated"})
         }  
     }catch(e){
       console.log(e)
@@ -63,8 +108,30 @@ app.post('/register',async(req,res)=>{
   const todayDate = date.getDate()
   const todayMonth = (date.getMonth()) + 1
   const todayYear = date.getFullYear()
+ 
+  const created_date = todayDate+'/'+todayMonth +"/"+todayYear
+  const schema = Joi.object({
+    PhoneNumber: Joi.string().pattern(/^[6-9]\d{9}$/).required().messages({
+      'string.pattern.base': 'Enter Valid Phone Number',
+      'any.required': 'Phone number is required',
+    }),
+    Lang: Joi.string().min(2).required().messages({
+      'string.empty': 'Language is required',
+    }),
+    age: Joi.string().min(2).required().messages({
+      'string.empty': 'Age is required',
+    }),
+    Interest: Joi.string().min(2).required().messages({
+      'string.empty': 'Interest is required',
+    }),
+    Name: Joi.string().min(2).required().messages({
+      'string.empty': 'Name is required',
+    }),
+    ocuupation: Joi.string().min(2).required().messages({
+      'string.empty': 'Occupation is required',
+    }),
+  });
 
-  const created_date = todayDate+':'+todayMonth +":"+todayYear
   console.log(created_date)
   try{
       main()
@@ -307,7 +374,7 @@ app.post('/agent',async(req,res)=>{
   const inputData = req.body
 
   
-    const { message, agentId, PhoneNumber } = inputData;
+    const { message, responses,agentId, PhoneNumber } = inputData;
     console.log("Parsed input:", inputData);
   if(!agentId || !PhoneNumber){
     return res.json({"message":"Fill Details"})
@@ -319,7 +386,7 @@ app.post('/agent',async(req,res)=>{
     console.log('agent selected')
     console.log(agentSelected)
     const user = await client.db(dbName).collection(user_collection).findOne({Phno:PhoneNumber})
-    console.log(user.credits)
+    console.log(agentSelected.Prompt,user.lang)
     if(!agentSelected){
      return res.json({message:"Agent not found"})
     }
@@ -330,32 +397,30 @@ app.post('/agent',async(req,res)=>{
       if(user.credits<1){
         return res.json({message:"Not enough credits , Purchase credits/ Add subcription"})
       }
-      console.log('Has Credit')
+
+      aiPromt = `translate the given message from ${user.lang} to english` + agentSelected.Prompt
+      console.log('Has Credit',aiPromt)
       const chatCompletion = await groq.chat.completions.create({
         "messages":[
             {
                 "role":"system",
-                "content": agentSelected.Prompt,
+                "content": aiPromt,
             },
             {
                 "role":"user",
                 "content":message
             },
             
+            
 
         ],
         "model":"llama-3.1-8b-instant",
         "temperature":agentSelected.Temperature,
-        "max_tokens":1024,
+        "max_tokens":agentSelected.Max_token,
         "stream":false,
         "stop":null
-       
-
     });
-    
     console.log('API fetch Completed')
-
-
     if(!chatCompletion){
       console.log('4')
      return res.json({message:"AI could not understand what you need could you be more specific"})
@@ -363,8 +428,7 @@ app.post('/agent',async(req,res)=>{
     const response = await client.db(dbName).collection(user_collection).updateOne({Phno:PhoneNumber},{$inc:{credits:-1}})
     console.log("Credit detected")
     console.log(chatCompletion.choices[0].message.content)
-    //const chatInsert = await client.db(dbName).collection(chat).insertOne({Phno:user.Phno,Agent_id:agentSelected.Agent_id,Agent_type:agentSelected.Agent_type,Input:message,Output:chatCompletion.choices[0].message.content,time_Stamp:[Date,time],creditsDebited:1,agent_category:agentSelected.agent_Category})
-    //console.log(chatInsert)
+    
     console.log('inserted')
    return res.json({user:message,message:chatCompletion.choices[0].message.content})
     
@@ -376,6 +440,51 @@ app.post('/agent',async(req,res)=>{
     client.close()
   }
 })
+
+app.post('/conversations',async(req,res)=>{
+  const {convos,agentId,PhoneNumber} = req.body
+  try{
+   await main()
+    console.log('hello inside agent')
+    const agentSelected = await client.db(dbName).collection(agent).findOne({Agent_id:agentId})
+    console.log('agent selected')
+    console.log(agentSelected)
+    const user = await client.db(dbName).collection(user_collection).findOne({Phno:PhoneNumber})
+    console.log(user)
+    if(!agentSelected){
+     return res.json({message:"Agent not found"})
+    }
+    if(!user){
+      return res.json({message:"user not found"})
+    }
+      if(user.credits<1){
+        return res.json({message:"Not enough credits , Purchase credits/ Add subcription"})
+      }
+      console.log('Has Credit')
+      const chatCompletion = await groq.chat.completions.create({
+       
+        "messages":convos,
+        "model":"llama-3.1-8b-instant",
+        "temperature":0.2,
+        "max_tokens":100,
+        "stream":false,
+        "stop":null
+    });
+    console.log('API fetch Completed')
+    if(!chatCompletion){
+      console.log('4')
+     return res.json({message:"AI could not understand what you need could you be more specific"})
+    }
+    // const response = await client.db(dbName).collection(user_collection).updateOne({Phno:PhoneNumber},{$inc:{credits:-1}})
+    // console.log("Credit detected")
+    console.log(chatCompletion.choices[0].message.content)
+    
+    console.log('inserted')
+   return res.json({message:chatCompletion.choices[0].message.content})
+
+}catch(e){
+  console.log(e)
+}})
 
 app.post('/getUser',async(req,res)=>{
   main()
@@ -390,6 +499,19 @@ app.post('/getUser',async(req,res)=>{
     console.log(user)
     if(!user){
       return res.json({message:"user Not found"})
+    }
+    const nextRenew = user.subcription?.nextRenew;
+    if(user.credits == 0 ){
+      return res.json({user:user,message:'Please Upgrade your plan or add credit'})
+    }
+    if (nextRenew) {
+      const today = moment();
+      const expiry = moment(nextRenew, 'D/M/YYYY');
+
+      const daysLeft = expiry.diff(today, 'days');
+      if (daysLeft <= 7 && daysLeft >= 0) {
+        return res.json({user:user,message:'Renew Your Subcription to enjoy all the features, Only '+daysLeft+'left untill your subcription expire'})
+      }
     }
     console.log('got user try')
     return res.json({user:user})

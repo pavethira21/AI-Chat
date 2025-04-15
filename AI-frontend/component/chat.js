@@ -5,8 +5,8 @@ import { styles } from "../Loginstyle";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function Chat(){
-const IP_Address ='192.168.1.5'
-let date
+const IP_Address ='192.168.1.11'
+  let date
   const navigation = useNavigation()
   const [chats,setChats] = useState()
   const [agentId,setAgentId]= useState()
@@ -19,12 +19,7 @@ let date
       handleGetChat()
     });
 
-    return unsubscribe;
-    
-
-      
-    
-    
+    return unsubscribe; 
   },[navigation,agentId])
   async function handleGetChat(){
     try{
@@ -107,8 +102,8 @@ console.log('dunction')
       </TouchableOpacity>
       </View>
   )}} /> :
-    <View>
-    <Text style={{color:"white"}}>No History Found</Text>
+    <View style={{alignItems:'center'}}>
+    <Text style={{color:"white",margin:20}}>No History Found</Text>
     </View>
     }
       
