@@ -11,6 +11,7 @@ import Register from './component/registration';
 import Agent from './component/agent';
 import subUsers from './component/subUsers';
 import ChatCards from './component/chatCards';
+import Subcription from './component/subcription';
 const Stack = createStackNavigator();
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
         <Stack.Screen name='SubUser' component={ChatCards}/>
         <Stack.Screen name='Register' component={Register}/> 
         <Stack.Screen name='Agent' component={Agent}/>
+        <Stack.Screen name='Premium' component={Subcription}/>
       </Stack.Navigator>  
     </NavigationContainer>
   );

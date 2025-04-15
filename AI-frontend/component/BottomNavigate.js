@@ -55,7 +55,7 @@ export default function BottomNavigate() {
       <Tab.Screen name={sub?"Ask AI":"Chat History"} component={sub?Home:Chat}
       options={{tabBarIcon :({size,focused}) => focused?<Ionicons name="chatbubbles" color={'#A357EF'} size={size} />:<Ionicons name="chatbubbles-outline" color={'gray'} size={size} />}}
       />
-      <Tab.Screen name={sub?"Chat History":"Premium"} component={sub?Chat:Subcription} 
+      <Tab.Screen name={sub?"Premium":"Chat History"} component={sub?Chat:Subcription} 
       options={{tabBarIcon :({size,focused}) => focused? <Ionicons name={sub?"chatbubbles":"star"} color={'#A357EF'}  size={size} />:<Ionicons name={sub?"chatbubbles-outline":"star-outline"} color={'gray'} size={size} />}}
       />
     </Tab.Navigator>

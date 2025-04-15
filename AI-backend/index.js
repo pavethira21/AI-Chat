@@ -475,8 +475,8 @@ app.post('/conversations',async(req,res)=>{
       console.log('4')
      return res.json({message:"AI could not understand what you need could you be more specific"})
     }
-    // const response = await client.db(dbName).collection(user_collection).updateOne({Phno:PhoneNumber},{$inc:{credits:-1}})
-    // console.log("Credit detected")
+    const response = await client.db(dbName).collection(user_collection).updateOne({Phno:PhoneNumber},{$inc:{credits:-1}})
+    console.log("Credit detected")
     console.log(chatCompletion.choices[0].message.content)
     
     console.log('inserted')
@@ -551,6 +551,17 @@ app.post('/addChathHistory',async(req,res)=>{
     console.log(e)
   }finally{
     client.close()
+  }
+})
+
+app.post('/getExcercise',async(req,res)=>{
+  try{
+    main()
+    console.log('api hit')
+    const excercise = await client.db(dbName).collection('exercise').find({}).toArray()
+    return res.status(200).json({excercise:excercise})
+  }catch(e){
+    console.log(e)
   }
 })
 

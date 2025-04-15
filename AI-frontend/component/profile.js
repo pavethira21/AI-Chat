@@ -6,9 +6,11 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import HeaderTag from './header'
 import { useNavigation } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Modal } from 'react-native';
 
 function Profile  ()  {
     const [user,setUser] = useState()
+    const [msg,setMessage] = useState()
      const IP_Address ='192.168.1.17'
     const navigation = useNavigation()
     useEffect(()=>{
@@ -32,13 +34,39 @@ function Profile  ()  {
                 headers:{'content-type':'application/json'},
                 body:JSON.stringify({PhoneNumber:PhoneNumber})
               }).then(response=>response.json()) 
-              .then((data)=>{setUser(data.user)})
+              .then((data)=>{setUser(data.user),setMessage(data.message)})
             console.log('after recieve')
               
     }
+    function handlePress(){
+      navigation.navigate('Premium')
+    }
 
   return (
+
     <SafeAreaView style={styles.container}>
+      {msg &&
+                  <Modal transparent={true} >
+                  <View style={{height: 'auto',
+                  padding:20,
+                  width: '80%',
+                  backgroundColor: 'white',
+                  alignItems:'center',
+                  borderRadius:20,
+                  position: 'absolute',
+                  left:30,bottom:'50%'}}>
+                    <Text  >{msg}</Text>
+                    <View style={{flexDirection:'row',gap:20,margin:20}}>
+                      <TouchableOpacity onPress={()=>(setVisible(!visible))}>
+                        <Text >cancel</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={handlePress}>
+                          <Text>Renew Subcription</Text>
+                          </TouchableOpacity>
+                    </View>
+                  </View>
+                  </Modal>
+                }
         <View style={{backgroundColor:'#121526',flexDirection:'row',width:'100%'}}>
       
       <TouchableOpacity  onPress={handleClose}  style={{height:50,width:50,position:'absolute',right:0}}>
@@ -53,6 +81,7 @@ function Profile  ()  {
         <Text style={styles.profileDetails}><Ionicons name={'phone-portrait-outline'}></Ionicons>{user.Phno}</Text>
         <Text style={styles.profileDetails}><Ionicons name={'person-circle-outline'}></Ionicons>{user.userName}</Text>
         <Text style={styles.profileDetails}><Ionicons name={'heart'}></Ionicons>{user.Area_of_interest}</Text>
+        <Text style={styles.profileDetails}><Ionicons name={'calendar-clear'}></Ionicons>Next Renewal Date {user.subcription.nextRenew} </Text>
         </View>}
       
       

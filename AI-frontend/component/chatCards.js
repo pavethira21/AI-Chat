@@ -3,15 +3,15 @@ import React, { useState } from 'react';
 import { SafeAreaView, View, Text, FlatList, TextInput, TouchableOpacity, Image, ActivityIndicator, KeyboardAvoidingView, Platform,}from'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const ChatCards = () => {
+const ChatCards = ({route}) => {
   const IP_Address = '192.168.1.17'; 
-
+  const excercise = route?.params?.item
+  console.log(excercise)
   const [message, setMessage] = useState('');
   const [convos, setConvos] = useState([
     {
       role: 'system',
-      content:
-        'Greet the user and ask a question. Let the user answer and have a conversation that takes place at work.',
+      content:excercise.prompt,
     },
   ]);
   const [loading, setLoading] = useState(false);

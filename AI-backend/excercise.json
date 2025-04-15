@@ -1,0 +1,81 @@
+[
+    {
+        "exId":1,
+        "Category":"Office",
+        "Name":"Discuss upcoming launch of your product",
+        "prompt":"Greet the user and ask a question. Let the user answer and have a conversation about the upcoming lauch of out new product in work within 100 tokens.",
+        "Temperature":"0.4",
+        "max_token":100
+
+        
+    }
+    ,{
+        "exId":2,
+        "Category":"Office",
+        "Name":"Discuss about the Issues faced druing the production",
+        "prompt":"Greet the user and ask a question. Let the user answer and have a conversation about the issues faced furing production of a product in work within 100 tokens.",
+        "Temperature":"0.4",
+        "max_token":100
+    },
+    {
+        "exId":3,
+        "Category":"Office",
+        "Name":"Marketing of new product",
+        "prompt":"Greet the user and ask a question. Let the user answer and have a disscusion of various marketting strategies to promote the new product  in work within 100 tokens.",
+        "Temperature":"0.4",
+        "max_token":100
+
+        
+    },
+    {
+        "exId":4,
+        "Category":"restaurant",
+        "Name":"Ordering food",
+        "prompt":"Greet the user and ask a question. Let the user answer and have conversation related to ordering food at a restaurant within 100 tokens.",
+        "Temperature":"0.5",
+        "max_token":100
+    },
+    {
+        "exId":5,
+        "Category":"restaurant",
+        "Name":" Requesting bill",
+        "prompt":"Greet the user and ask a question. Let the user answer and have conversation related to requesting bill and paying bill at a restaurant within 100 tokens.",
+        "Temperature":"0.5",
+        "max_token":100
+    },
+    {
+        "exId":6,
+        "Category":"restaurant",
+        "Name":"  Getting Reservation",
+        "prompt":"Greet the user and ask a question. Let the user answer and have conversation related to requesting reservation at a restaurant within 100 tokens.",
+        "Temperature":"0.5",
+        "max_token":100
+    },
+    {
+        "exId":7,
+        "Category":"Travel",
+        "Name":"Asking Direction",
+        "prompt":"Greet the user and ask a question. Let the user answer and have conversation Asking for direction to a specific place within 100 tokens.",
+        "Temperature":"0.5",
+        "max_token":100
+
+    },
+    {
+        "exId":8,
+        "Category":"Travel",
+        "Name":"Travel Booking",
+        "prompt":"Greet the user and ask a question. Let the user answer and have conversation confirming travel bookings  within 100 tokens.",
+        "Temperature":"0.5",
+        "max_token":100
+
+    },
+   
+    {
+        "exId":9,
+        "Category":"Interest",
+        "Name":"Lets Talk about your hobbies",
+        "prompt":"Greet the user and ask a question. Let the user answer and have conversation about their interest  within 100 tokens.",
+        "Temperature":"0.5",
+        "max_token":100
+    }
+]

@@ -78,7 +78,6 @@ export default function Register(){
         style={{backgroundColor:(age =='kid'?'#A357EF':"#3B3E45"),padding:10,width:'50%',alignItems:'center',borderEndStartRadius:20,borderEndEndRadius:20}} 
         onPress={()=>setAge('kid')}><Text style={{color:'white'}}>Kid</Text></Pressable>
     </View>
-    
         <Text style={styles.cardText}>What is your name?</Text>
         <TextInput style={{borderWidth:2,borderColor:'#3B3E45',color:'white'}} placeholderTextColor={'gray'} placeholder="Add your Name" onChangeText={(e)=>{setName(e)}} value={name}></TextInput>
         

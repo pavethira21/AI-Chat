@@ -14,8 +14,8 @@ function Subcription ()  {
   const [showSubList,setSub] = useState('subscribe')
  const IP_Address ='192.168.1.17'
  
-  const subscribe = [{'title':"Quaterly Plan",period:90,color:['#4286f4', '#4364F7'],Description:["Enjoy Unlimited access to AI-chat for 3 Months and Improve Your english Skills","Ask AI Using Voice and Chat"],Price:'$6.99'},
-    {"title":"Half Year Plan",period:183,color:['#ED213A', '#93291E'],Description:["Enjoy Unlimited access to AI-chat for 3 Months and Improve Your english Skills"],Price:'$10.00'},
+  const subscribe = [{'title':"Quaterly Plan",period:90,color:['#4286f4', '#4364F7'],Description:["Practice English with AI 24/7","200 credits on purchase","Access Translate, Grammar,Basic Language Support"],Price:'$6.99'},
+    {"title":"Half Year Plan",period:183,color:['#ED213A', '#93291E'],Description:["Enjoy Unlimited access to AI-chat for 3 Months and Improve Your english Skills","Multilingual support"],Price:'$10.00'},
     {"title":"Around the Clock Plan",color:['#ad5389', '#3c1053'],period:365,Description:["Enjoy Unlimited access to AI-chat for 3 Months and Improve Your english Skills"],Price:'$4.99'}]
 
     const credit =[{id:1,title:"Buy 25 Credits",price:"100",credit:25},{id:2,title:"Buy 50 Credits",price:"100",credit:50},{id:3,title:"Buy 100 Credits",price:"250",credit:100},

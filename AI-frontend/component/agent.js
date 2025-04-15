@@ -21,7 +21,7 @@ export default function Agent({route}){
     const [recording,setRecording] = useState()
     
     const chat = route?.params?.chat
-
+    const agentId = route?.params?.agentId
     useEffect(() => {
         console.log('useffect',chat)
         if (chat) {  
@@ -171,7 +171,7 @@ export default function Agent({route}){
         console.log("mes",message)
         
         if(message?.length >=3){
-            const input = {agentId:agent,type:'text',message:message,PhoneNumber:PhoneNumber}
+            const input = {agentId:agentId || agent,type:'text',message:message,PhoneNumber:PhoneNumber}
             
         let res = await fetch(`http://${IP_Address}:5000/agent`,{
             method:"POST",
@@ -273,7 +273,7 @@ export default function Agent({route}){
                     <>
                     <View style={{flexDirection:'row',alignItems:'center'}}>
                     <Image source={require("../assets/chat-image.png")} style={{width:"150",height:'150' }}></Image>
-                    <Text style={{color:'white'}}>Hello I will Help You With {agent} </Text>
+                    <Text style={{color:'white'}}>Hello I will Help You With {agentId || agent} </Text>
                     </View> 
                     </>}
                     
