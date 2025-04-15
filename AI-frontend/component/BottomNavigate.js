@@ -18,7 +18,7 @@ export default function BottomNavigate() {
       console.log('useEffect')
       getUserStatus()
     },[])
-    const IP_Address ='192.168.1.11'
+    const IP_Address ='192.168.1.17'
 
     async function getUserStatus(){
       console.log('hello')

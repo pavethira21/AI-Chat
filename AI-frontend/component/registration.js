@@ -24,7 +24,7 @@ export default function Register(){
     },[])
     
      
-  const IP_Address ='192.168.1.11'
+  const IP_Address ='192.168.1.17'
     const languages =['Tamil','Hindi','Kannada','Telugu','Marathi','Malayalam']
     const Occupation = ['College','Work','Home Maker','Teacher','Other']
     const [age,setAge] = useState('adult')

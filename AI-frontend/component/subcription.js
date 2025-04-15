@@ -12,7 +12,7 @@ function Subcription ()  {
   const [visible,setVisible] = useState()
   const [item,setItem] = useState()
   const [showSubList,setSub] = useState('subscribe')
- const IP_Address ='192.168.1.11'
+ const IP_Address ='192.168.1.17'
  
   const subscribe = [{'title':"Quaterly Plan",period:90,color:['#4286f4', '#4364F7'],Description:["Enjoy Unlimited access to AI-chat for 3 Months and Improve Your english Skills","Ask AI Using Voice and Chat"],Price:'$6.99'},
     {"title":"Half Year Plan",period:183,color:['#ED213A', '#93291E'],Description:["Enjoy Unlimited access to AI-chat for 3 Months and Improve Your english Skills"],Price:'$10.00'},

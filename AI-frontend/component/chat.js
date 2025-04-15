@@ -5,7 +5,7 @@ import { styles } from "../Loginstyle";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function Chat(){
-const IP_Address ='192.168.1.11'
+const IP_Address ='192.168.1.17'
   let date
   const navigation = useNavigation()
   const [chats,setChats] = useState()

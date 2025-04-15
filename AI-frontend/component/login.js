@@ -10,7 +10,7 @@ import {Ionicons} from '@expo/vector-icons';
 
 
 export default function Login(){
-    const IP_Address ='192.168.1.11'
+    const IP_Address ='192.168.1.17'
     const [phoneNumber,setPhNo] = useState()
     const [isValid,setValid] = useState(false)
     const [Otp,setOtp]= useState()

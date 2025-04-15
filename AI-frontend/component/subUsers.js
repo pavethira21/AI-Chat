@@ -31,14 +31,14 @@ function SubUsers () {
               </Pressable>
               </LinearGradient>
               
-             )}/>
+             )}/>  
              </View>
              
              
              <View style={{marginTop:10,height:5,width:'100%',backgroundColor:'gray'}}/>
              <Text style={{color:'white', fontSize: 16, fontWeight: "500" }}>English at Office</Text>
              <View>
-             <View style={{color:'#2A2A3A'}}>
+             <View style={{color:'#2A2A3A',height:10}}>
               <Text style={{color:'white'}}>Discuss about the upcoming launch of your product</Text>
               
               </View>

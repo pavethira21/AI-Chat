@@ -1,21 +1,10 @@
 
 import React, { useState } from 'react';
-import {
-  SafeAreaView,
-  View,
-  Text,
-  FlatList,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
+import { SafeAreaView, View, Text, FlatList, TextInput, TouchableOpacity, Image, ActivityIndicator, KeyboardAvoidingView, Platform,}from'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 const ChatCards = () => {
-  const IP_Address = '192.168.1.11'; 
+  const IP_Address = '192.168.1.17'; 
 
   const [message, setMessage] = useState('');
   const [convos, setConvos] = useState([
@@ -132,3 +121,5 @@ const ChatCards = () => {
     </SafeAreaView>
   );
 };
+
+export default ChatCards
