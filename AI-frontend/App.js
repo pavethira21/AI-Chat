@@ -16,7 +16,7 @@ const Stack = createStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName="BtNv">   
+      <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName="Login">   
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name='BtNv'  component={BottomNavigate}/>
         <Stack.Screen name='Profile' component={Profile}/>
@@ -24,7 +24,7 @@ export default function App() {
         <Stack.Screen name='SubUser' component={ChatCards}/>
         <Stack.Screen name='Register' component={Register}/> 
         <Stack.Screen name='Agent' component={Agent}/>
-        <Stack.Screen name='Premium' component={Subcription}/>
+        <Stack.Screen name='Premium' screenOptions={{headerShown:false}} component={Subcription}/>
       </Stack.Navigator>  
     </NavigationContainer>
   );

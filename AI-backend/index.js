@@ -26,6 +26,8 @@ const dbName = 'AIChat';
 const user_collection ="user"
 const agent= 'agents'
 const chat ='chat'
+const excer = 'exercise'
+const excerHstory = 'excerciseHistory'
 const date = new Date()
 var secret = speakeasy.generateSecret({length: 20});
 const groq = new Groq({
@@ -218,6 +220,9 @@ app.post('/getCredit',async(req,res)=>{
     if(!user){
       return res.json({message:"user Not found"})
     }
+    if(user.credits == 0 ){
+      return res.json({user:user,message:'Please Upgrade your plan or add credit'})
+    }
     console.log('got user try')
     return res.json({credit:user.credits})
   }catch(e){
@@ -349,7 +354,7 @@ app.post('/getChat',async(req,res)=>{
  }else{
   console.log('no agent id')
   chats = await client.db(dbName).collection(chat).find({Phno:PhoneNumber},
-    {projection:{conversation:1,time_Stamp:1,_id:0,Agent_id:1}}).sort({time_Stamp:-1}).toArray()
+    {projection:{conversation:1,time_Stamp:1,_id:0,Agent_id:1}}).sort({time_Stamp:-1}).limit(10).toArray()
  }
  
   //const agent_name = await client.db(dbName).collection(agent).findOne({Agent_id:chats[0].Agent_id},{projection:{_id:0,Name:1}})
@@ -402,7 +407,7 @@ app.post('/agent',async(req,res)=>{
       console.log('Has Credit',aiPromt)
       const chatCompletion = await groq.chat.completions.create({
         "messages":[
-            {
+            {  
                 "role":"system",
                 "content": aiPromt,
             },
@@ -501,16 +506,14 @@ app.post('/getUser',async(req,res)=>{
       return res.json({message:"user Not found"})
     }
     const nextRenew = user.subcription?.nextRenew;
-    if(user.credits == 0 ){
-      return res.json({user:user,message:'Please Upgrade your plan or add credit'})
-    }
+    
     if (nextRenew) {
       const today = moment();
       const expiry = moment(nextRenew, 'D/M/YYYY');
 
       const daysLeft = expiry.diff(today, 'days');
       if (daysLeft <= 7 && daysLeft >= 0) {
-        return res.json({user:user,message:'Renew Your Subcription to enjoy all the features, Only '+daysLeft+'left untill your subcription expire'})
+        return res.json({user:user,message:'Renew Your Subcription to enjoy all the features, Only '+daysLeft+'days left untill your subcription expire'})
       }
     }
     console.log('got user try')
@@ -555,13 +558,58 @@ app.post('/addChathHistory',async(req,res)=>{
 })
 
 app.post('/getExcercise',async(req,res)=>{
+  const {PhoneNumber} = req.body
   try{
     main()
     console.log('api hit')
-    const excercise = await client.db(dbName).collection('exercise').find({}).toArray()
+    const user = await client.db(dbName).collection(user_collection).findOne({Phno:PhoneNumber})
+
+    if(!user){
+      return res.status(404).json({message:"User not found"})
+    }
+    console.log(user.age)
+    const excercise = await client.db(dbName).collection(excer).find({user_Category:user.age}).sort({Category:1}).toArray()
     return res.status(200).json({excercise:excercise})
   }catch(e){
     console.log(e)
+  }finally{
+    client.close()
+  }
+})
+
+app.post('/addExcerciseHistory',async(req,res)=>{
+  try{
+    main()
+      const {convos,category , PhoneNumber} = req.body
+      const result = await client.db(dbName).collection(excerHstory).insertOne({PhoneNumber:PhoneNumber,conversation:convos,Category:category})
+      if(!result){
+        return res.status(404).json({message:"Could Not Insert Chat"})
+      }
+
+      return res.status(200).json({message:"inserted successfully"})
+  }catch(e){
+    console.log("error",e)
+  }finally{
+    client.close()
+  }
+})
+
+app.post('/getExcerciseHistory',async(req,res)=>{ 
+  try{
+    main()
+    const {PhoneNumber} = req.body
+    const excerciseHistory = await client.db(dbName).collection(excerHstory).find({PhoneNumber:PhoneNumber}).sort({Category:1}).toArray()
+    console.log(excerciseHistory)
+    if(!excerciseHistory){ 
+
+      return res.status(404).json({message:"no history found"})
+    }
+
+    return res.status(200).json({excerHistory:excerciseHistory})
+  }catch(e){
+    console.log("error",e)
+  }finally{
+    client.close()
   }
 })
 

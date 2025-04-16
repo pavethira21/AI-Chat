@@ -6,9 +6,12 @@ import HeaderTag from "./header"
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native"
 import { LinearGradient } from "expo-linear-gradient"
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 function SubUsers () {
     const navigation = useNavigation()
+    const [showEx,setShow] = useState(false)
+    const [excerHistory,sethistory] = useState([])
     const [excer,setExcer] = useState()
      function handleAgentNavigate(id) {
         navigation.navigate('Agent',{
@@ -22,12 +25,14 @@ function SubUsers () {
     }
     const IP_Address = '192.168.1.17'
     async function fetchExcersice(){
+      const PhoneNumber = await AsyncStorage.getItem('PhoneNumber')
+      console.log(PhoneNumber)
       console.log('excersice fetch')
       let res = await fetch(`http://${IP_Address}:5000/getExcercise`,{
         method:"POST",
         headers: { 'Content-Type': 'application/json' },
-
-      })
+        body:JSON.stringify({PhoneNumber:PhoneNumber})
+      }) 
 
       const data = await res.json()
       console.log(data)
@@ -48,13 +53,37 @@ function SubUsers () {
 
     },[navigation])
 
+    async function handleHistory(){
+      setShow(true)
+
+      try{
+        const PhoneNumber = await AsyncStorage.getItem("PhoneNumber")
+        console.log('dunction')
+      const input = {PhoneNumber:PhoneNumber}
+      console.log(input)
+      const res = await fetch(`http://${IP_Address}:5000/getExcerciseHistory`,{
+        method:"POST",
+        headers:{'content-type':'application/json'},
+        body:JSON.stringify(input)
+      }) 
+       const data = await res.json()
+       console.log(data)
+       sethistory(data.excerHistory) 
+      }catch(e){
+        console.log(e)
+      }
+      
+
+    }
+    let cat 
+    console.log(cat)
     const agents_sub = [{Name:'Draft an Email',description:'Write professional email &messages with AI ',agentId:3,color:["#FFA500","#e76d2c"],img:require('../assets/young-woman.png')},
     {Name:"Translate",description:"Translate from any language to english",agentId:1,color:['#7cfc00','#0bda51'],img:require('../assets/english.png')}]
   return (
     <SafeAreaView style={styles.container}>
              
              <HeaderTag></HeaderTag>
-              <View style={{height:310}}>
+              <View style={{height:280}}>
              <FlatList  showsHorizontalScrollIndicator={false}  data={agents_sub}   
              contentContainerStyle={{ paddingHorizontal: 20, marginTop: 50 }}
         keyExtractor={(item, index) => index.toString()} horizontal renderItem={({item})=>(
@@ -71,66 +100,84 @@ function SubUsers () {
              </View>
              
              
-             <View style={{marginTop:10,height:5,width:'100%',backgroundColor:'gray'}}/>
-             <Text style={{color:'white', fontSize: 16, fontWeight: "500" }}>English at Office</Text>
-             <FlatList  style={{gap:20}} data={excer} keyExtractor={(item,index)=>index.toString()}
-             renderItem={({item})=>{
-              if(item.Category ==='Office'){
+             
+             <View style={{display:"flex",padding:20,flexDirection:"row",borderRadius:20}} >
+                     <Pressable onPress={()=>(setShow(false))}
+                     style={{backgroundColor:"#3B3E45",padding:10,width:'50%',alignItems:'center',borderBottomWidth:2,borderColor:(!showEx ? '#A357EF':'gray')}}
+                      ><Text style={{color:'white'}}>For You</Text></Pressable> 
+                     <Pressable onPress={handleHistory}
+                     style={{backgroundColor:"#3B3E45",padding:10,width:'50%',alignItems:'center',borderBottomWidth:2,borderColor:(showEx ? '#A357EF':'gray')}} 
+                     ><Text style={{color:'white'}}> Completed</Text></Pressable>
+                     </View>
+                     <View style={{width:'90%'}}>
+            {!showEx ?
+             <FlatList  data={excer} keyExtractor={(item,index)=>index.toString()}
+             renderItem={({item})=>{  
+              
+              const showCategory = item.Category !==cat
+              if(item.Category !== cat){
+                cat = item.Category 
+                
+              }
                 return(
+                  <>
+                 
+                  {showCategory && 
+                  <>
+                 < View style={{height:2,marginTop:10,width:'100%',backgroundColor:'gray'}}/>
+                  <Text style={{color:'white', fontSize: 16, fontWeight: "500",marginTop:20 }}>Basic english at {cat}</Text></>
+                  }
                   <Pressable onPress={()=>handleExcerciseNavigate(item)}>
               
                   <View style={{backgroundColor:'#2A2A3A',marginTop:10,padding:20,flexDirection:'row',alignItems:'center'}}>
                    <Text style={{color:'white'}}>{item.Name}</Text>
                    <Ionicons color={'gray'} size={25} name={'arrow-forward-outline'}></Ionicons>
                    </View>
-                   </Pressable>
+                   </Pressable> 
+                     
+                   </>
+                   
                 )
-              }}}
+              }}
              
+             />:
+             
+             <FlatList  style={{gap:20,height:'100%'}} data={excerHistory} keyExtractor={(item,index)=>index.toString()}
+             renderItem={({item})=>{  
               
-             
-             
+              const showCategory = item.Category !==cat
+              if(item.Category !== cat){
+                cat = item.Category 
+                
+              }
+                return(
+                  <>
+                 
+                  {showCategory && 
+                  <>
+                 
+                  <Text style={{color:'white', fontSize: 16, fontWeight: "500" }}>Basic english at {cat}</Text></>
+                  }
+                  <Pressable onPress={()=>handleExcerciseNavigate(item)}>
+              
+                  <View style={{backgroundColor:'#2A2A3A',marginTop:10,padding:20,flexDirection:'row',alignItems:'center'}}>
+                   <Text style={{color:'white'}}>{item.Name}</Text>
+                   <Ionicons color={'gray'} size={25} name={'arrow-forward-outline'}></Ionicons>
+                   </View>
+                   </Pressable> 
+                     
+                   </>
+                   
+                )
+              }}
              
              />
+             
+             }</View>
              
 
               
-    <View style={{marginTop:10,height:3,width:'100%',backgroundColor:'gray'}}/>
-              <Text style={{color:'white', fontSize: 16, fontWeight: "500" }}>Basic english at restaurant</Text>
-              <FlatList  style={{gap:20}} data={excer} keyExtractor={(item,index)=>index.toString()}
-             renderItem={({item})=>{
-              if(item.Category ==='restaurant'){
-                return(
-                  <Pressable onPress={()=>handleExcerciseNavigate(item)}>
-              
-                  <View style={{backgroundColor:'#2A2A3A',padding:20,marginTop:10,flexDirection:'row',alignItems:'center'}}>
-                   <Text style={{color:'white'}}>{item.Name}</Text>
-                   <Ionicons color={'gray'} size={25} name={'arrow-forward-outline'}></Ionicons>
-                   </View>
-                   </Pressable>
-                )
-              }}}
-             />
-              <View style={{marginTop:10,height:3,width:'100%',backgroundColor:'gray'}}/>
-  
-  <Text style={{color:'white', fontSize: 16, fontWeight: "500" }}>Basic english while Travelling</Text>
-  <FlatList   data={excer} keyExtractor={(item,index)=>index.toString()}
-             renderItem={({item})=>{
-              if(item.Category ==='Travel'){
-                return(
-                  <Pressable onPress={()=>handleExcerciseNavigate(item)} style={{gap:20}} >
-              
-                  <View style={{backgroundColor:'#2A2A3A',marginTop:10,padding:20,flexDirection:'row',alignItems:'center'}}>
-                   <Text style={{color:'white'}}>{item.Name}</Text>
-                   <Ionicons color={'gray'} size={25} name={'arrow-forward-outline'}></Ionicons>
-                   </View>
-                   </Pressable>
-                )
-              }}}
-             />
-  <View style={{marginTop:10,height:3,width:'100%',backgroundColor:'gray'}}/>
-  <Text style={{color:'white', fontSize: 16, fontWeight: "500" }}>Talk about your interest and Hobbies</Text>
-  
+    
 </SafeAreaView> 
   )
 }

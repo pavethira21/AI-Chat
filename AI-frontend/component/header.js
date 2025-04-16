@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import {Ionicons} from '@expo/vector-icons';
 import { Image } from "react-native"
 import { styles } from '../Loginstyle'
+import { Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native'
 import { Dimensions } from 'react-native';
@@ -40,11 +41,11 @@ function HeaderTag () {
                 headers:{'content-type':'application/json'}, 
                 body:JSON.stringify({PhoneNumber:PhoneNumber})
               })
-
               const data = await res.json()
               setCredit(data.credit)
 
               if(data.credit==0){
+                
                 setVisible(true)
               }
 
@@ -55,12 +56,13 @@ function HeaderTag () {
     }  
 
     function handlePress(){
-      navigation.navigate('subcription')
+      navigation.navigate('Premium')
+      setVisible(false)
     }
    
   return (
     <View style={{backgroundColor:'#121526',flexDirection:'row',marginTop:20,width:'100%'}}>
-      {visible ==true &&
+      {visible &&
                   <Modal transparent={true} >
                   <View style={{height: 'auto',
                   padding:20,
@@ -70,9 +72,9 @@ function HeaderTag () {
                   
                   position: 'absolute',
                   left:30,bottom:'50%'}}>
-                    <Text  >Do you want to Purchase Credit?</Text>
+                    <Text  >Upgrade plan or purchase credit</Text>
                     <View style={{flexDirection:'row',gap:20,margin:20}}>
-                      <TouchableOpacity onPress={()=>(setVisible(!visible))}>
+                      <TouchableOpacity onPress={()=>(setVisible(false))}>
                         <Text >cancel</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={handlePress}>

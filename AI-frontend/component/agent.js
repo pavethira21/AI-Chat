@@ -39,15 +39,18 @@ export default function Agent({route}){
 
     useEffect(() => {
         handleStore()
-
+            
           const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+            console.log('hello in effect',responses)
             handleNavigate()
-            console.log('printed')
+            console.log('printed before navigate')
          
-          });
+          }); 
       
           return unsubscribe;
-        }, [navigation]);
+        }, []);
+
+
     async function handleStore(){
         const item = await  AsyncStorage.getItem('agent')
         const phoneNumber = await  AsyncStorage.getItem('PhoneNumber')
@@ -136,7 +139,7 @@ export default function Agent({route}){
 
     async function handleNavigate(){
         try{
-            console.log('handlenavigate')
+            console.log(responses)
         const phoneNumber = await  AsyncStorage.getItem('PhoneNumber')
         console.log('hit')
         if(responses.length<1){
@@ -155,7 +158,7 @@ export default function Agent({route}){
         if (addDb.status ==200){
             navigation.navigate('BtNv')
         }
-        }
+    } 
         }catch(e){
             console.log(e)
         }
@@ -215,6 +218,8 @@ export default function Agent({route}){
         
 
     }
+    const copy = (agent === "7" || agent === "3") 
+    console.log(copy)
     return(
         <>
         {responses && console.log("responses",responses)}
@@ -245,12 +250,11 @@ export default function Agent({route}){
                         </View>
                         <View style={{flexDirection:'row',marginTop:10,marginRight:10}}>
                             <Image source={require('../assets/character.png') } style={{height:40,width:40,marginRight:10,borderRadius:20}}></Image>
-                        <View  style={{backgroundColor:'#3B3E45'
-                            ,borderBottomLeftRadius:20,borderBottomRightRadius:20,borderTopRightRadius:20,elevation:9,marginRight:30
+                        <View  style={{backgroundColor:'#3B3E45',borderBottomLeftRadius:20,borderBottomRightRadius:20,borderTopRightRadius:20,elevation:9,marginRight:30
                         }}>
                         
-                        <Text style={{color:"white" , padding:10,marginBottom:10}}>{item.message}</Text>
-                        { agent == '7' &&( <View style={{flexDirection:'row'}}>
+                        <Text numberOfLines={10} style={{color:"white" , padding:10,marginBottom:10}}>{item.message}</Text>
+                        { copy &&( <View style={{flexDirection:'row'}}>
                              <Pressable style={{backgroundColor:'gray',padding:5,alignItems:'center',marginLeft:20,borderRadius:10,marginBottom:10,right:10}}
                               onPress={()=>handleCopy(item.message)}>
                                 <Ionicons name='copy' size={18} color={'white'}></Ionicons>
@@ -279,7 +283,7 @@ export default function Agent({route}){
                     
                
                </View>
-               {(loading&&<ActivityIndicator size='large'>loading...</ActivityIndicator>)} 
+               {(loading && <ActivityIndicator size='large'>loading...</ActivityIndicator>)} 
                 <KeyboardAvoidingView style={{flexDirection:'row',gap:10,padding:20,backgroundColor:'#121526'}} >
                     
                     <TextInput multiline={true} style={{backgroundColor:'white',width:'320',borderStartStartRadius:10,borderEndStartRadius:10}} value={message} onChangeText={(e)=>{setMessage(e) }}  ></TextInput>

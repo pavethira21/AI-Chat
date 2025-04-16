@@ -63,7 +63,17 @@ export const styles = StyleSheet.create({
     left: 10,
   },
   profileDetails:
-  {color:'white',padding:10,borderColor:'white',borderWidth:2,margin:20,borderRadius:20}
+  {color:'white',
+    padding:10,
+    borderColor:'gray',
+    borderWidth:2,
+    margin:10,
+    fontSize:20,
+    borderRadius:20
+    },
+    modalStyle:{
+      backgroundColor:'#5a189a'
+    }
 
 });
 

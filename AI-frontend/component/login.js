@@ -97,7 +97,7 @@ export default function Login(){
 
             if(res.status==200){
                 console.log('1')
-                ToastAndroid.showWithGravity(message,ToastAndroid.SHORT,
+                ToastAndroid.showWithGravity(`${data.message}`,ToastAndroid.SHORT,
                     ToastAndroid.BOTTOM)
                 console.log('hello')
             }
@@ -120,11 +120,11 @@ export default function Login(){
                 <Text style={{...styles.cardText,width:200,marginRight:20}}>Hi, I'm your 24/7 AI english Tutor</Text>
             </View>
             
-            {user&& <Text style={{color:'white'}}>{token}</Text>}
+            
             {message=="Verification code Generated" ?
             
             <>
-            
+            {user && <Text style={{color:'white'}}>{token}</Text>}
             <View>
             <Text style={{...styles.cardText,marginBottom:20}} >OTP</Text>
             <View style={{display:"flex",flexWrap:"wrap",flexDirection:'row',marginBottom:20,borderWidth:1,borderColor:'gray',borderRadius:20,backgroundColor:'#121526'}}>

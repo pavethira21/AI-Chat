@@ -9,8 +9,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Modal } from 'react-native';
 
 function Profile  ()  {
-    const [user,setUser] = useState()
     const [msg,setMessage] = useState()
+    const [user,setUser] = useState()
+    const [visible,setVisible] = useState()
      const IP_Address ='192.168.1.17'
     const navigation = useNavigation()
     useEffect(()=>{
@@ -33,19 +34,28 @@ function Profile  ()  {
             method:"POST",
                 headers:{'content-type':'application/json'},
                 body:JSON.stringify({PhoneNumber:PhoneNumber})
-              }).then(response=>response.json()) 
-              .then((data)=>{setUser(data.user),setMessage(data.message)})
+              })
+
+              const data = await res.json()
+              setUser(data.user)
+              if(data.message){
+                setVisible(true)
+                setMessage(data.message)
+              }
             console.log('after recieve')
               
     }
     function handlePress(){
-      navigation.navigate('Premium')
+      console.log(user)
+      navigation.navigate('Premium',{
+        user:user
+      })
     }
 
   return (
 
     <SafeAreaView style={styles.container}>
-      {msg &&
+      {visible &&
                   <Modal transparent={true} >
                   <View style={{height: 'auto',
                   padding:20,
@@ -57,7 +67,7 @@ function Profile  ()  {
                   left:30,bottom:'50%'}}>
                     <Text  >{msg}</Text>
                     <View style={{flexDirection:'row',gap:20,margin:20}}>
-                      <TouchableOpacity onPress={()=>(setVisible(!visible))}>
+                      <TouchableOpacity onPress={()=>(setVisible(false))}>
                         <Text >cancel</Text>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={handlePress}>
@@ -76,17 +86,23 @@ function Profile  ()  {
     </View>
         {user &&
         
-        <View>
+        <>
+        
         <Text style={{...styles.cardText,fontSize:25}}><Ionicons name={'person'} size={20}></Ionicons>profile</Text>
-        <Text style={styles.profileDetails}><Ionicons name={'phone-portrait-outline'}></Ionicons>{user.Phno}</Text>
-        <Text style={styles.profileDetails}><Ionicons name={'person-circle-outline'}></Ionicons>{user.userName}</Text>
-        <Text style={styles.profileDetails}><Ionicons name={'heart'}></Ionicons>{user.Area_of_interest}</Text>
-        <Text style={styles.profileDetails}><Ionicons name={'calendar-clear'}></Ionicons>Next Renewal Date {user.subcription.nextRenew} </Text>
-        </View>}
+        <View style={{margin:20}}>
+        <Text style={styles.profileDetails}><Ionicons name={'phone-portrait-outline'} size={15}></Ionicons>  {user.Phno}</Text>
+        <Text style={styles.profileDetails}><Ionicons name={'person-circle-outline'} size={15}></Ionicons>  {user.userName}</Text>
+        
+        {user.subcription.nextRenew && <Text style={styles.profileDetails}><Ionicons name={'calendar-clear'}></Ionicons>Next Renewal Date {user.subcription.nextRenew} </Text>}
+        </View></>}
+       
       
-      
-      <TouchableOpacity style={{backgroundColor:'orange',padding:10,borderRadius:10,width:'90%',alignItems:'center'}} onPress={handleLogOut}><Text style={{color:'white'}}>LogOut</Text></TouchableOpacity>
+      <View style={{backgroundColor:'#ffb700',padding:10,borderRadius:10,width:'90%',alignItems:'center',position:'absolute',bottom:10}}>
+      <TouchableOpacity  onPress={handleLogOut}><Text style={{color:'white',fontWeight:400,fontSize:20}}>LogOut</Text></TouchableOpacity>
+      </View>
+     
     </SafeAreaView>
+     
   )
 }
 
