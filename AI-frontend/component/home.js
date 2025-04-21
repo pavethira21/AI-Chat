@@ -9,6 +9,8 @@ import {Ionicons} from '@expo/vector-icons';
 import { useNavigation } from "@react-navigation/native"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import HeaderTag from "./header"
+import { Dimensions } from "react-native";
+import { ActivityIndicator } from "react-native";
 
 
 
@@ -30,19 +32,21 @@ export default function Home(){
         console.log(token)
     }
     
-    //const IP_Address= process.env.IP_Address
+    
     const navigation = useNavigation()
 
    
 
     const [agents ,setAgents] = useState([])
-   const IP_Address ='192.168.1.17'
+    const [loading,setLoading] = useState(true)
+    const IP_Address = process.env.EXPO_PUBLIC_IP_ADDRESS
 
     console.log(IP_Address)
     async  function handleAgent(item){
         console.log(item)
         try {
           await AsyncStorage.setItem("agent", item.Agent_id);
+          await AsyncStorage.setItem("agentSession",PhoneNumber+Date.now())
           navigation.navigate('Agent');
       } catch (error) {
           console.error("Error storing agent:", error);
@@ -58,6 +62,8 @@ export default function Home(){
                
               }).then(response => response.json())
               .then(data=>{ setAgents(data.agents)})
+
+              setLoading(false)
         }catch(e){
             console.log(e)
         }
@@ -68,6 +74,14 @@ export default function Home(){
         
     },[])
     console.log(agents)
+    const { width, height } = Dimensions.get('window');
+    if(loading){
+        return(
+            <SafeAreaView style={{...styles.container,justifyContent:'center',alignItems:'center'}}>
+                <ActivityIndicator color='purple' size='large'/>
+            </SafeAreaView>
+        )
+    }
     
         return( 
            
@@ -77,7 +91,7 @@ export default function Home(){
              <HeaderTag></HeaderTag>
              <Text>{PhoneNumber ? `Phone Number: ${PhoneNumber}` : 'No phone number stored'}</Text>
 
-             <Image source={require("../assets/Home.png")} style={{width:300,height:200,borderRadius:20 }}></Image>
+             <Image source={require("../assets/Home.png")} style={{width:width * 0.8,height:height * 0.25,borderRadius:20 }}></Image>
              
              <FlatList data={agents} numColumns={2}  renderItem={({item,index}) =>(
                  <TouchableOpacity onPress={()=>{handleAgent(item)}} key={index} style={styles.card}>

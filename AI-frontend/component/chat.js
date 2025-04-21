@@ -1,11 +1,11 @@
 import React from "react";
 import { useState,useEffect,useRef } from "react";
-import { FlatList, SafeAreaView, TouchableOpacity,Text,View,Image, Pressable } from "react-native";
+import { FlatList, SafeAreaView, TouchableOpacity,Text,View,Image, Pressable, Dimensions } from "react-native";
 import { styles } from "../Loginstyle";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function Chat(){
-const IP_Address ='192.168.1.17'
+  const IP_Address = process.env.EXPO_PUBLIC_IP_ADDRESS
   let date
   const navigation = useNavigation()
   const [chats,setChats] = useState()
@@ -53,12 +53,13 @@ console.log('dunction')
   {Name:'General Knowledge',id:'9'},
   {Name:'Chat with   AI',id:'11'},
  ]
+ const {width,height} = Dimensions.get('window')
   
   return(
     <SafeAreaView style={styles.container}>
-      <Image source={require("../assets/history.png")} style={{width:300,height:200,borderRadius:20 }}></Image>
+      <Image source={require("../assets/history.png")} style={{width:width* 0.8,height:height * 0.25,borderRadius:20 }}></Image>
       <View >
-      <FlatList horizontal data={agents} style={{maxHeight:50}}  renderItem={({item})=>(
+      <FlatList horizontal data={agents} style={{maxHeight:height * 0.06}}  renderItem={({item})=>(
         <Pressable onPress={()=>setAgentId(item.id)} style={{borderColor:(agentId==item.id?'white':'gray'),borderWidth:1,borderRadius:20,marginRight:10}} >
         <Text style={{padding:10,color:'white'}}>{item.Name}</Text>
 

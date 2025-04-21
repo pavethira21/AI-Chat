@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, Pressable,Image, FlatList,TouchableOpacity,Modal,ToastAndroid,ImageBackground } from 'react-native'
+import { View, Text, SafeAreaView, Pressable,Image, FlatList,TouchableOpacity,Modal,ToastAndroid,ImageBackground, Dimensions } from 'react-native'
 import React, { useState } from 'react'
 import {Ionicons} from '@expo/vector-icons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
@@ -11,8 +11,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 function Subcription ({route})  { 
   const [visible,setVisible] = useState()
   const [item,setItem] = useState()
-  const [showSubList,setSub] = useState('subscribe')
- const IP_Address ='192.168.1.17'
+  const [showSubList,setSub] = useState(true)
+  const IP_Address = process.env.EXPO_PUBLIC_IP_ADDRESS
  const user = route?.params?.user
  console.log('user',user)
  const status = user?.subcription.Status ==='Active'
@@ -73,6 +73,7 @@ function Subcription ({route})  {
 //     navigation.navigate('BtNv')
 // }
 
+const {width,height} = Dimensions.get('window')
   
   return (
     <SafeAreaView style={styles.container}>
@@ -80,12 +81,12 @@ function Subcription ({route})  {
             <Modal transparent={true} >
             <View style={{height: 'auto',
             padding:20,
-            width: '80%',
+            width: width * 0.8,
             backgroundColor: 'white',
             alignItems:'center',
             
             position: 'absolute',
-            left:30,bottom:'50%'}}>
+            left:30,bottom:height * 0.5}}>
               <Text  >Do you want to Purchase Credit?</Text>
               <View style={{flexDirection:'row',gap:20,margin:20}}>
                 <TouchableOpacity onPress={()=>(setVisible(!visible))}>
@@ -101,18 +102,18 @@ function Subcription ({route})  {
       <View style={{flexDirection:'column'}}>
         
         <View style={{alignItems:"center"}}>
-        <Image  source={require('../assets/loading.png')} style={{width:"200",height:'200',borderRadius:20, marginTop:20}}/>
+        <Image  source={require('../assets/loading.png')} style={{width:width * 0.4,height:height * 0.25,borderRadius:20, marginTop:20}}/>
         </View>
-        <View style={{display:"flex",padding:20,flexDirection:"row",width:'100%',borderRadius:20,justifyContent:'center'}} >
-        <Pressable onPress={()=>(setSub('subscribe'))}
-        style={{backgroundColor:"#3B3E45",padding:10,width:'50%',alignItems:'center',borderBottomWidth:2,borderColor:(showSubList=='subscribe' ? '#A357EF':'gray')}}
+        <View style={{display:"flex",padding:20,flexDirection:"row",width:width * 0.95,borderRadius:20,justifyContent:'center'}} >
+        <Pressable onPress={()=>(setSub(true))}
+        style={{backgroundColor:"#3B3E45",padding:10,width:width * 0.5,alignItems:'center',borderBottomWidth:2,borderColor:(showSubList ? '#A357EF':'gray')}}
          ><Text style={{color:'white'}}>Subcriptions</Text></Pressable> 
-        {status && <Pressable onPress={()=>(setSub('credit'))}
-        style={{backgroundColor:"#3B3E45",padding:10,width:'50%',alignItems:'center',borderBottomWidth:2,borderColor:(showSubList=='credit' ? '#A357EF':'gray')}} 
+        {status && <Pressable onPress={()=>(setSub(false))}
+        style={{backgroundColor:"#3B3E45",padding:10,width:width * 0.5,alignItems:'center',borderBottomWidth:2,borderColor:(!showSubList ? '#A357EF':'gray')}} 
         ><Text style={{color:'white'}}>Purchase Credit</Text></Pressable>}
         </View>
         
-       {showSubList =='subscribe' ?
+        {showSubList ?
        <FlatList data={subscribe}  renderItem={({item,index})=>
         (
         <View  style={{backgroundColor:'white',flex: 1,margin:20,alignItems:'center',borderRadius:20}}>
@@ -144,6 +145,7 @@ function Subcription ({route})  {
       
        
       }/>:
+      
       <FlatList data={credit} renderItem={({item}) =>
         (
         <LinearGradient colors={['#4286f4', '#4364F7']}

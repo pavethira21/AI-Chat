@@ -14,7 +14,7 @@ import { Dimensions } from 'react-native';
 function HeaderTag () {
    const [visible,setVisible] = useState()
     const [credit,setCredit] = useState()
-     const IP_Address ='192.168.1.17'
+    const IP_Address = process.env.EXPO_PUBLIC_IP_ADDRESS
     const navigation = useNavigation()
 
     useEffect(() => {

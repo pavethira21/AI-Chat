@@ -1,5 +1,7 @@
 import {StyleSheet} from 'react-native';
+import { Dimensions } from 'react-native';
 
+const {width,height} = Dimensions.get('window')
 export const styles = StyleSheet.create({
   container: {
     padding:16,
@@ -23,7 +25,7 @@ export const styles = StyleSheet.create({
   },
   button:{
     //backgroundColor:'#A357EF',
-    width:'90%',
+    width:width * 0.9,
     color:'white',
     borderRadius:10,
     padding:10,
@@ -32,8 +34,8 @@ export const styles = StyleSheet.create({
   },
   card:{
     
-    width: "150",
-    height:"160",
+    width: width * 0.37,
+    height:height * 0.2,
     backgroundColor: "#2A2A3A",
     marginLeft:10,
     padding: 16,

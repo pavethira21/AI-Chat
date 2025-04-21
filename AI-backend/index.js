@@ -54,7 +54,7 @@ app.post('/subscription',async(req,res)=>{
   console.log(endDate)
   const createdDate = todayDate+'/'+todayMonth +"/"+todayYear
   try{
-    main()
+    await main()
 
     const result = await client.db(dbName).collection(user_collection).updateOne({Phno:Phno},{$set:{subcription:{Status:'Active',startDate:createdDate,nextRenew:endDate}}})
     if(result){
@@ -93,9 +93,9 @@ app.post('/login',async(req,res)=>{
           var token = speakeasy.totp({
             secret: secret.base32,
             encoding: 'base32'
-          });
+          }); 
           console.log(token)
-         return res.status(200).json({message:"Verification code Generated"})
+         return res.status(200).json({message:"Verification code Generated",token:token})
         }  
     }catch(e){
       console.log(e)
@@ -106,6 +106,7 @@ app.post('/login',async(req,res)=>{
 })
 
 app.post('/register',async(req,res)=>{
+  try{
   const {PhoneNumber,Lang,age,Interest,Name,ocuupation}= req.body
   const todayDate = date.getDate()
   const todayMonth = (date.getMonth()) + 1
@@ -135,7 +136,7 @@ app.post('/register',async(req,res)=>{
   });
 
   console.log(created_date)
-  try{
+  
       main()
       if(!PhoneNumber,!Lang,!age,!Interest,!Name,!ocuupation){
         res.json({message:"Fill all the Details"})
@@ -159,7 +160,7 @@ app.post('/register',async(req,res)=>{
 
 app.post('/verifyToken', async(req,res)=>{
     const {verifyToken,PhoneNumber} = req.body
-    main()
+    await main()
     try{
       var tokenValidates = speakeasy.totp.verify({
         secret: secret.base32,
@@ -193,7 +194,7 @@ app.post('/verifyToken', async(req,res)=>{
 })
 
 app.post('/getAgent',async(req,res)=>{
-  main()
+  await main()
   try {
       const agents = await client.db(dbName).collection(agent).find({Agent_type:'Text'},{projection:{Agent_id:1,Name:1,Category:1,Description:1,icon:1}}).toArray()
       if(agents){
@@ -207,7 +208,7 @@ app.post('/getAgent',async(req,res)=>{
 })
 
 app.post('/getCredit',async(req,res)=>{
-  main()
+  await main()
   try{
     console.log('inside try')
     const {PhoneNumber} = req.body
@@ -238,7 +239,7 @@ const upload = multer({ storage: storage });
 app.post('/creditUpdate',async(req,res)=>{
   const {PhoneNumber,creditIncrease} = req.body
   try{
-    main()
+    await main()
     const response = await client.db(dbName).collection(user_collection)
     .updateOne({Phno:PhoneNumber},{$inc:{credits:creditIncrease}})
     res.status(200).json(response)
@@ -256,7 +257,7 @@ app.post ('/agentSpeech',upload.single('audio'),async(req,res)=>{
   }
   const {agentId, PhoneNumber } = inputData;
     console.log("Parsed input:", inputData);
-  main()
+  await main()
 
   try{
     console.log('hello inside agent')
@@ -341,8 +342,8 @@ app.post ('/agentSpeech',upload.single('audio'),async(req,res)=>{
 
 app.post('/getChat',async(req,res)=>{
   try{
-    main()
-    let chats;
+   await main()
+  let chats;
   const {PhoneNumber,agentId} =req.body
   if(!PhoneNumber){
     return res.json({message:"Details not enough"})
@@ -364,7 +365,7 @@ app.post('/getChat',async(req,res)=>{
   if(!chats){
     return res.json({message:"chats not found"})
   }
-  console.log(chats)
+  console.log(chats) 
   return res.status(200).json({chat:chats})
   }catch(e){
     console.log(e)
@@ -384,13 +385,14 @@ app.post('/agent',async(req,res)=>{
   if(!agentId || !PhoneNumber){
     return res.json({"message":"Fill Details"})
   }
-  main()
+  await main()
   try{
     console.log('hello inside agent')
     const agentSelected = await client.db(dbName).collection(agent).findOne({Agent_id:agentId})
     console.log('agent selected')
     console.log(agentSelected)
     const user = await client.db(dbName).collection(user_collection).findOne({Phno:PhoneNumber})
+    console.log(user)
     console.log(agentSelected.Prompt,user.lang)
     if(!agentSelected){
      return res.json({message:"Agent not found"})
@@ -447,18 +449,15 @@ app.post('/agent',async(req,res)=>{
 })
 
 app.post('/conversations',async(req,res)=>{
-  const {convos,agentId,PhoneNumber} = req.body
+  const {convos,category,PhoneNumber} = req.body
   try{
    await main()
     console.log('hello inside agent')
-    const agentSelected = await client.db(dbName).collection(agent).findOne({Agent_id:agentId})
-    console.log('agent selected')
-    console.log(agentSelected)
+    
+   
     const user = await client.db(dbName).collection(user_collection).findOne({Phno:PhoneNumber})
     console.log(user)
-    if(!agentSelected){
-     return res.json({message:"Agent not found"})
-    }
+    
     if(!user){
       return res.json({message:"user not found"})
     }
@@ -492,7 +491,7 @@ app.post('/conversations',async(req,res)=>{
 }})
 
 app.post('/getUser',async(req,res)=>{
-  main()
+  await main()
   try{
     console.log('inside try')
     const {PhoneNumber} = req.body
@@ -525,7 +524,7 @@ app.post('/getUser',async(req,res)=>{
   }
   
 })
-
+  
 app.post('/addChathHistory',async(req,res)=>{
  
   console.log('history hit')
@@ -538,7 +537,7 @@ app.post('/addChathHistory',async(req,res)=>{
     const minutes = date.getMinutes() 
     const Date = todayDate+'/'+todayMonth +"/"+todayYear
     const time=hours+":"+minutes
-      main()
+      await main()
       console.log(PhoneNumber)
       const user = await client.db(dbName).collection(user_collection).findOne({Phno:PhoneNumber})
       console.log('got user')
@@ -558,17 +557,21 @@ app.post('/addChathHistory',async(req,res)=>{
 })
 
 app.post('/getExcercise',async(req,res)=>{
-  const {PhoneNumber} = req.body
+  
   try{
-    main()
+    const {PhoneNumber} = req.body
+    await main()
     console.log('api hit')
     const user = await client.db(dbName).collection(user_collection).findOne({Phno:PhoneNumber})
 
     if(!user){
       return res.status(404).json({message:"User not found"})
     }
+    await main()
     console.log(user.age)
-    const excercise = await client.db(dbName).collection(excer).find({user_Category:user.age}).sort({Category:1}).toArray()
+    
+    const excercise = await client.db(dbName).collection(excer).find({user_Category:user.age}).sort({Category:-1}).toArray()
+    console.log(excercise)
     return res.status(200).json({excercise:excercise})
   }catch(e){
     console.log(e)
@@ -579,7 +582,7 @@ app.post('/getExcercise',async(req,res)=>{
 
 app.post('/addExcerciseHistory',async(req,res)=>{
   try{
-    main()
+    await main()
       const {convos,category , PhoneNumber} = req.body
       const result = await client.db(dbName).collection(excerHstory).insertOne({PhoneNumber:PhoneNumber,conversation:convos,Category:category})
       if(!result){
@@ -596,7 +599,7 @@ app.post('/addExcerciseHistory',async(req,res)=>{
 
 app.post('/getExcerciseHistory',async(req,res)=>{ 
   try{
-    main()
+    await main()
     const {PhoneNumber} = req.body
     const excerciseHistory = await client.db(dbName).collection(excerHstory).find({PhoneNumber:PhoneNumber}).sort({Category:1}).toArray()
     console.log(excerciseHistory)

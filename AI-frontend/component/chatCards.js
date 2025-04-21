@@ -1,10 +1,11 @@
 
 import React, { useState } from 'react';
-import { SafeAreaView, View, Text, FlatList, TextInput, TouchableOpacity, Image, ActivityIndicator, KeyboardAvoidingView, Platform,}from'react-native';
+import { SafeAreaView, View, Text, FlatList, TextInput, TouchableOpacity, Image, ActivityIndicator, KeyboardAvoidingView, Platform, Dimensions,}from'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ChatCards = ({route}) => {
-  const IP_Address = '192.168.1.17'; 
+  const IP_Address = process.env.EXPO_PUBLIC_IP_ADDRESS
   const excercise = route?.params?.item
   console.log(excercise)
   const [message, setMessage] = useState('');
@@ -29,14 +30,16 @@ const ChatCards = ({route}) => {
     setLoading(true);
 
     try {
+      const PhoneNumber = await  AsyncStorage.getItem('PhoneNumber')
+      console.log(PhoneNumber)
       const res = await fetch(`http://${IP_Address}:5000/conversations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          agentId: '1',
+          category:excercise.Category,
           type: 'text',
           convos: updatedConvos,
-          PhoneNumber: '8939221348',
+          PhoneNumber: PhoneNumber,
         }),
       });
 
@@ -59,7 +62,7 @@ const ChatCards = ({route}) => {
     const isUser = item.role === 'user';
     return (
       <View
-        style={{flexDirection: isUser ? 'row-reverse' : 'row',marginVertical: 5, alignItems: 'flex-end',
+        style={{flexDirection: isUser ? 'row-reverse' : 'row',marginTop:20,marginVertical: 5, alignItems: 'flex-end',
         }}
       >
         {!isUser && (
@@ -78,46 +81,68 @@ const ChatCards = ({route}) => {
     );
   };
 
+  async function handleNavigate(){
+    try{
+      
+  const phoneNumber = await  AsyncStorage.getItem('PhoneNumber')
+  console.log('hit')
+  if(convos.length<1){
+      console.log('no convo')
+      navigation.navigate('BtNv') 
+  }
+  else{
+      console.log('convos available')
+      const input = {Category:excercise.Category,convos:convos,PhoneNumber:phoneNumber}
+  const addDb = await fetch(`http://${IP_Address}:5000/addExcerciseHistory`,{
+      method:"POST",
+      headers:{'content-type':'application/json'},
+      body:JSON.stringify(input)
+  })
+
+  if (addDb.status ==200){
+      navigation.navigate('BtNv')
+  }
+} 
+  }catch(e){
+      console.log(e)
+  }
+  }
+
+  const {width,height} = Dimensions.get('window')
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#121526' }}>
-      <FlatList data={convos.slice(1)} keyExtractor={(_, index) => index.toString()}renderItem={renderMessage}contentContainerStyle={{ padding: 16 }}
-      />
+      <View style={{backgroundColor:'#121526',flexDirection:'row',width:'100%',margin:20,overflow:'visible'}}>
+                 
+                 <TouchableOpacity  onPress={handleNavigate}  style={{height:height * 0.05,width:width*0.13,position:'absolute',left:0,backgroundColor:'orange',alignItems:'center',justifyContent:'center',marginTop:20,borderRadius:20}}>
+                  <Text style={{color:'white'}}>
+                     <Ionicons name={'arrow-back-outline'} color={'black'} size={25}/>
+                 </Text>
+                 </TouchableOpacity> 
+                   
+                 </View> 
+                 
 
+                 
+      <FlatList data={convos.slice(1)} keyExtractor={(_, index) => index.toString()} renderItem={renderMessage} contentContainerStyle={{ padding: 16 }}
+      />
+      
       {loading && (
         <ActivityIndicator size="large" color="#A357EF" style={{ marginBottom: 10 }} />
       )}
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={{flexDirection: 'row',padding: 10,alignItems: 'center',backgroundColor: '#1c1f2e',
-        }}
-      >
-        <TextInput
-          style={{
-            flex: 1,
-            backgroundColor: '#fff',
-            borderRadius: 20,
-            paddingHorizontal: 15,
-            paddingVertical: 10,
-            fontSize: 16,
-          }}
-          placeholder="Type a message..."
-          value={message}
-          onChangeText={setMessage}
-          multiline
-        />
-        <TouchableOpacity
-          onPress={sendMessage}
-          style={{
-            marginLeft: 10,
-            backgroundColor: '#9400D3',
-            borderRadius: 25,
-            padding: 12,
-          }}
-        >
-          <Ionicons name="send" size={20} color="#fff" />
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
+
+                <KeyboardAvoidingView style={{flexDirection:'row',gap:10,padding:20,backgroundColor:'#121526'}} >
+                    
+                    <TextInput multiline={true} style={{backgroundColor:'white',width:width * 0.7,borderStartStartRadius:10,borderEndStartRadius:10}} value={message} onChangeText={(e)=>{setMessage(e) }}  ></TextInput>
+                    
+                     
+               
+                    
+                    <TouchableOpacity onPress={sendMessage} style={{backgroundColor:'#9400D3',borderRadius:40,width:width * 0.12 ,justifyContent:'center',alignItems:'center'}} ><Ionicons style={{color:'white',position:'absolute'}}  name={"send"} size={25} /></TouchableOpacity>
+                    
+                </KeyboardAvoidingView>
+      
     </SafeAreaView>
   );
 };

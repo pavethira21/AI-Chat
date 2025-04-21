@@ -9,6 +9,8 @@ import { useNavigation } from '@react-navigation/native';
 import * as clipboard from 'expo-clipboard';
 import * as sharing from 'expo-sharing';
 import { ActivityIndicator } from 'react-native';
+import { Dimensions } from 'react-native';
+import * as Linking from 'expo-linking';
 
 
 export default function Agent({route}){
@@ -23,7 +25,7 @@ export default function Agent({route}){
     const chat = route?.params?.chat
     const agentId = route?.params?.agentId
     useEffect(() => {
-        console.log('useffect',chat)
+        console.log('useffect',agentId)
         if (chat) {  
             console.log('insideif')
             chat.forEach((item) => {
@@ -63,7 +65,7 @@ export default function Agent({route}){
     }
 
    
-     const IP_Address ='192.168.1.17'
+    const IP_Address = process.env.EXPO_PUBLIC_IP_ADDRESS
 
    
 
@@ -73,6 +75,7 @@ export default function Agent({route}){
             
             const { status } = await Audio.requestPermissionsAsync();
             if (status !== 'granted') {
+                await Linking.openSettings();
               alert('Permission to access microphone is required!');
               return;
             }
@@ -220,13 +223,14 @@ export default function Agent({route}){
     }
     const copy = (agent === "7" || agent === "3") 
     console.log(copy)
+    const { width, height } = Dimensions.get('window');
     return(
         <>
         {responses && console.log("responses",responses)}
         <SafeAreaView style={styles.container}>
-            <View style={{backgroundColor:'#121526',flexDirection:'row',width:'100%',margin:20}}>
+            <View style={{backgroundColor:'#121526',flexDirection:'row',width:'100%',margin:20,overflow:'visible'}}>
                  
-                <TouchableOpacity  onPress={handleNavigate}  style={{height:50,width:50,position:'absolute',left:0,backgroundColor:'orange',alignItems:'center',justifyContent:'center',borderRadius:20}}>
+                <TouchableOpacity  onPress={handleNavigate}  style={{height:height * 0.05,width:width*0.13,position:'absolute',left:0,backgroundColor:'orange',alignItems:'center',justifyContent:'center',borderRadius:20}}>
                  <Text style={{color:'white'}}>
                     <Ionicons name={'arrow-back-outline'} color={'black'} size={25}/>
                 </Text>
@@ -245,15 +249,16 @@ export default function Agent({route}){
                             
                              
                        
-                        <View style={{backgroundColor:'#A357EF',padding:10,elevation:10,marginBottom:5,borderRadius:20}}>
+                        <View style={{backgroundColor:'#A357EF',padding:10,elevation:10,marginBottom:5,borderRadius:20,flexDirection:"row-reverse"}}>
                         <Text style={{color:'white',padding:10}}>{item.user }</Text>
                         </View>
+                        
                         <View style={{flexDirection:'row',marginTop:10,marginRight:10}}>
-                            <Image source={require('../assets/character.png') } style={{height:40,width:40,marginRight:10,borderRadius:20}}></Image>
+                            <Image source={require('../assets/character.png') } style={{height:height * 0.04,width:width * 0.1,marginRight:10,borderRadius:20}}></Image>
                         <View  style={{backgroundColor:'#3B3E45',borderBottomLeftRadius:20,borderBottomRightRadius:20,borderTopRightRadius:20,elevation:9,marginRight:30
                         }}>
                         
-                        <Text numberOfLines={10} style={{color:"white" , padding:10,marginBottom:10}}>{item.message}</Text>
+                        <Text  style={{color:"white" , padding:10,marginBottom:10}}>{item.message}</Text>
                         { copy &&( <View style={{flexDirection:'row'}}>
                              <Pressable style={{backgroundColor:'gray',padding:5,alignItems:'center',marginLeft:20,borderRadius:10,marginBottom:10,right:10}}
                               onPress={()=>handleCopy(item.message)}>
@@ -276,7 +281,7 @@ export default function Agent({route}){
                     : 
                     <>
                     <View style={{flexDirection:'row',alignItems:'center'}}>
-                    <Image source={require("../assets/chat-image.png")} style={{width:"150",height:'150' }}></Image>
+                    <Image source={require("../assets/chat-image.png")} style={{width:width * 0.35,height:height * 0.15 }}></Image>
                     <Text style={{color:'white'}}>Hello I will Help You With {agentId || agent} </Text>
                     </View> 
                     </>}
@@ -286,12 +291,12 @@ export default function Agent({route}){
                {(loading && <ActivityIndicator size='large'>loading...</ActivityIndicator>)} 
                 <KeyboardAvoidingView style={{flexDirection:'row',gap:10,padding:20,backgroundColor:'#121526'}} >
                     
-                    <TextInput multiline={true} style={{backgroundColor:'white',width:'320',borderStartStartRadius:10,borderEndStartRadius:10}} value={message} onChangeText={(e)=>{setMessage(e) }}  ></TextInput>
+                    <TextInput multiline={true} style={{backgroundColor:'white',width:width * 0.7,borderStartStartRadius:10,borderEndStartRadius:10}} value={message} onChangeText={(e)=>{setMessage(e) }}  ></TextInput>
                     
                      
                
-                    {(message&&message.length>=1)?<TouchableOpacity onPress={handleChat} style={{backgroundColor:'#9400D3',borderRadius:40,width:50 ,justifyContent:'center',alignItems:'center'}} ><Ionicons style={{color:'white',position:'absolute'}}  name={"send"} size={25} /></TouchableOpacity>:
-                    <TouchableOpacity onPressIn={handleRecording}  onPressOut={stopRecording} style={{backgroundColor:'#9400D3',borderRadius:40,width:50 ,justifyContent:'center',alignItems:'center'}} ><Ionicons style={{color:'white',position:'absolute'}}  name={"mic"} size={25}/></TouchableOpacity>}
+                    {(message&&message.length>=1)?<TouchableOpacity onPress={handleChat} style={{backgroundColor:'#9400D3',borderRadius:40,width:width * 0.12 ,justifyContent:'center',alignItems:'center'}} ><Ionicons style={{color:'white',position:'absolute'}}  name={"send"} size={25} /></TouchableOpacity>:
+                    <TouchableOpacity onPressIn={handleRecording}  onPressOut={stopRecording} style={{backgroundColor:'#9400D3',borderRadius:40,width:width * 0.12 ,justifyContent:'center',alignItems:'center'}} ><Ionicons style={{color:'white',position:'absolute'}}  name={"mic"} size={25}/></TouchableOpacity>}
                 </KeyboardAvoidingView>
                 
         </SafeAreaView>

@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, FlatList } from 'react-native'
+import { View, Text, TouchableOpacity, FlatList, Dimensions } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { styles } from '../Loginstyle'
 import {Ionicons} from '@expo/vector-icons';
@@ -12,7 +12,8 @@ function Profile  ()  {
     const [msg,setMessage] = useState()
     const [user,setUser] = useState()
     const [visible,setVisible] = useState()
-     const IP_Address ='192.168.1.17'
+    const [loading,setLoading] = useState()
+    const IP_Address = process.env.EXPO_PUBLIC_IP_ADDRESS
     const navigation = useNavigation()
     useEffect(()=>{
         handleGetUser()
@@ -52,6 +53,8 @@ function Profile  ()  {
       })
     }
 
+    const {width,height} = Dimensions.get('window')
+
   return (
 
     <SafeAreaView style={styles.container}>
@@ -59,7 +62,7 @@ function Profile  ()  {
                   <Modal transparent={true} >
                   <View style={{height: 'auto',
                   padding:20,
-                  width: '80%',
+                  width: width* 0.8,
                   backgroundColor: 'white',
                   alignItems:'center',
                   borderRadius:20,

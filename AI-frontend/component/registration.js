@@ -5,6 +5,7 @@ import { FlatList } from "react-native-gesture-handler";
 import {Ionicons} from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function Register(){
     const navigation = useNavigation()
@@ -24,7 +25,7 @@ export default function Register(){
     },[])
     
      
-  const IP_Address ='192.168.1.17'
+    const IP_Address = process.env.EXPO_PUBLIC_IP_ADDRESS
     const languages =['Tamil','Hindi','Kannada','Telugu','Marathi','Malayalam']
     const Occupation = ['College','Work','Home Maker','Teacher','Other']
     const [age,setAge] = useState('adult')
@@ -73,10 +74,10 @@ export default function Register(){
         <View style={{display:"flex",padding:20,flexDirection:"row",width:'100%',borderRadius:20}} >
         <Pressable 
         style={{backgroundColor:(age =='adult'?'#A357EF':"#3B3E45"),padding:10,width:'50%',alignItems:'center',borderStartStartRadius:20,borderStartEndRadius:20}}
-         onPress={()=>setAge('adult')}><Text style={{color:'white'}}>Adult</Text></Pressable> 
+         onPress={()=>setAge('Adult')}><Text style={{color:'white'}}>Adult</Text></Pressable> 
         <Pressable 
         style={{backgroundColor:(age =='kid'?'#A357EF':"#3B3E45"),padding:10,width:'50%',alignItems:'center',borderEndStartRadius:20,borderEndEndRadius:20}} 
-        onPress={()=>setAge('kid')}><Text style={{color:'white'}}>Kid</Text></Pressable>
+        onPress={()=>setAge('Kid')}><Text style={{color:'white'}}>Kid</Text></Pressable>
     </View>
         <Text style={styles.cardText}>What is your name?</Text>
         <TextInput style={{borderWidth:2,borderColor:'#3B3E45',color:'white'}} placeholderTextColor={'gray'} placeholder="Add your Name" onChangeText={(e)=>{setName(e)}} value={name}></TextInput>
@@ -107,8 +108,10 @@ export default function Register(){
         }
         
         
-        
+        <LinearGradient style={{...styles.button,marginTop:20}}
+              colors={['#6A3E9F', '#9B59B6']}>
         <TouchableOpacity onPress={handleRegister} style={styles.button}><Text>Continue</Text></TouchableOpacity>
+        </LinearGradient>
         </View>
 
            :
